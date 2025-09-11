@@ -8,3 +8,10 @@ parameters:
         - '#Call to undefined function.*#'
         - '#Function.*not found.*#'
         - '#Constant.*not found.*#'
+    parallel:
+        maximumNumberOfProcesses: 1
+    tmpDir: /tmp/phpstan
+    excludes_analyse:
+        - '*/tests/*'
+        - '*/vendor/*'
+        - '*/node_modules/*'
