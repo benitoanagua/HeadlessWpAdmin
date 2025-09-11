@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<ruleset name="WordPress Plugin Coding Standards">
+    <description>Coding standards for WordPress plugin</description>
+    
+    <!-- What to scan -->
+    <file>./src</file>
+    
+    <!-- Show progress -->
+    <arg value="p"/>
+    
+    <!-- Show sniff codes -->
+    <arg value="s"/>
+    
+    <!-- Use colors -->
+    <arg name="colors"/>
+    
+    <!-- Rules -->
+    <rule ref="WordPress"/>
+    <rule ref="WordPress.Security"/>
+    <rule ref="WordPress.Performance"/>
+    
+    <!-- Exclude some rules -->
+    <rule ref="WordPress.Files.FileName.InvalidClassFileName">
+        <exclude-pattern>*/src/*</exclude-pattern>
+    </rule>
+    
+    <!-- PHP version -->
+    <config name="minimum_supported_wp_version" value="6.0"/>
+    <config name="testVersion" value="8.0-"/>
+</ruleset>

@@ -1,50 +1,107 @@
 # Headless WordPress Admin
 
-A complete headless WordPress solution with full admin dashboard configuration.
+Administración headless para WordPress con interfaz moderna
 
-## Features
+## Características
 
-- ✅ Completely block frontend access
-- ✅ Configurable GraphQL (requires WPGraphQL plugin)
-- ✅ Configurable REST API
-- ✅ Fully customizable blocked page
-- ✅ CORS configuration for development
-- ✅ Automatic WordPress cleanup
-- ✅ Security headers
-- ✅ Logging and debugging
-- ✅ Compatibility with other plugins
+- ✅ Arquitectura orientada a objetos con PSR-4 autoloading
+- ✅ Gestión de dependencias con Composer y pnpm
+- ✅ Pipeline de assets con Vite
+- ✅ Frontend moderno con Svelte y Tailwind CSS v4
+- ✅ Calidad de código con PHPStan y PHPCS
+- ✅ CI/CD con GitHub Actions
 
-## Installation
+## Requisitos
 
-1. Upload the plugin to your `/wp-content/plugins/` directory
-2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Go to Settings > Headless Mode to configure
+- PHP 8.0+
+- WordPress 6.0+
+- Node.js 18+
+- Composer
+- pnpm
 
-## Recommended Configuration
+## Instalación para desarrollo
 
-- Enable GraphQL (install WPGraphQL plugin)
-- Disable REST API (unless needed)
-- Configure CORS for your frontend
-- Customize blocked page with your branding
-- Enable security headers
+1. Clona el repositorio:
+   ```bash
+   git clone <repository-url> headless-wp-admin
+   cd headless-wp-admin
+   ```
 
-## Development
+2. Instala las dependencias PHP:
+   ```bash
+   composer install
+   ```
 
-- Use GraphQL endpoint: /graphql
-- Configure CORS for localhost during development
-- Enable debug logging for troubleshooting
+3. Instala las dependencias Node.js:
+   ```bash
+   pnpm install
+   ```
 
-## Production
+4. Inicia el servidor de desarrollo:
+   ```bash
+   pnpm run dev
+   ```
 
-- Disable debug logging
-- Configure CORS only for production domains
-- Enable all security features
-- Fully customize the blocked page
+5. Para compilar para producción:
+   ```bash
+   pnpm run build
+   ```
 
-## Support
+## Scripts disponibles
 
-For support and documentation, visit [website URL]
+### PHP
+- `composer run phpstan` - Análisis estático con PHPStan
+- `composer run phpcs` - Revisión de estándares de código
+- `composer run phpcbf` - Corrección automática de estándares
+- `composer run test` - Ejecuta todas las pruebas de calidad
 
-## Changelog
+### Node.js
+- `pnpm run dev` - Servidor de desarrollo
+- `pnpm run build` - Compilación para producción
+- `pnpm run preview` - Preview de la build
+- `pnpm run check` - Verificación de tipos TypeScript
 
-See [CHANGELOG.md](CHANGELOG.md) for details.
+## Estructura del proyecto
+
+```
+headless-wp-admin/
+├── src/                    # Código PHP
+│   ├── Admin/             # Clases para el admin
+│   ├── Frontend/          # Clases para el frontend
+│   ├── Core/              # Clases principales
+│   └── Utils/             # Utilidades
+├── assets/                # Archivos fuente
+│   ├── js/               # JavaScript
+│   ├── css/              # CSS
+│   ├── svelte/           # Componentes Svelte
+│   └── images/           # Imágenes
+├── public/               # Archivos compilados
+├── tests/                # Pruebas
+├── languages/            # Traducciones
+└── vendor/               # Dependencias PHP
+```
+
+## Desarrollo
+
+El plugin utiliza una arquitectura moderna con las siguientes tecnologías:
+
+- **Backend**: PHP 8.0+ con arquitectura orientada a objetos y PSR-4
+- **Frontend**: Svelte con Tailwind CSS v4
+- **Build**: Vite para compilación ultrarrápida
+- **Calidad**: PHPStan nivel 8 y PHPCS con estándares de WordPress
+
+## Contribuir
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## Licencia
+
+GPL v2 or later
+
+## Autor
+
+Benito Anagua - [benito.anagua@gmail.com](mailto:benito.anagua@gmail.com)

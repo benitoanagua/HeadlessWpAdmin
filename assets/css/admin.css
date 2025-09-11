@@ -1,0 +1,14 @@
+@import 'tailwindcss';
+
+/* Estilos específicos para el admin */
+.admin-container {
+    @apply p-6 bg-white rounded-lg shadow-sm;
+}
+
+.admin-header {
+    @apply mb-6 pb-4 border-b border-gray-200;
+}
+
+.admin-title {
+    @apply text-2xl font-semibold text-gray-900;
+}

@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+
+/* Estilos específicos para el frontend */
+.frontend-container {
+    @apply p-4 bg-gray-50 rounded-lg;
+}
+
+.frontend-content {
+    @apply text-gray-700;
+}
