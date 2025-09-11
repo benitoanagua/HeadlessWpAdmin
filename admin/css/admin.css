@@ -1,0 +1,168 @@
+/* Headless WordPress Admin Styles */
+.headless-config-section {
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  border-radius: 4px;
+  margin: 20px 0;
+  padding: 20px;
+}
+
+.headless-config-section h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  color: #1d2327;
+}
+
+.headless-form-row {
+  margin: 15px 0;
+}
+
+.headless-form-row label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #1d2327;
+}
+
+.headless-form-row input[type="text"],
+.headless-form-row input[type="url"],
+.headless-form-row textarea,
+.headless-form-row select {
+  width: 100%;
+  max-width: 600px;
+  padding: 8px;
+  border: 1px solid #8c8f94;
+  border-radius: 4px;
+}
+
+.headless-form-row textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.headless-form-row .description {
+  font-style: italic;
+  color: #646970;
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.headless-admin-footer {
+  background: #f6f7f7;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 4px;
+  border: 1px solid #dcdcde;
+}
+
+.color-preview {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.headless-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-active {
+  background: #46b450;
+}
+.status-inactive {
+  background: #dc3232;
+}
+
+.headless-status-widget {
+  border: 1px solid #c3c4c7;
+  padding: 15px;
+  background: #f6f7f7;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.headless-status-widget h4 {
+  margin-top: 0;
+  color: #1d2327;
+}
+
+.headless-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+@media (max-width: 768px) {
+  .headless-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .headless-tools-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tab specific styles */
+.nav-tab-wrapper {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ccc;
+}
+
+.nav-tab {
+  border: 1px solid #ccc;
+  border-bottom: none;
+  background: #f1f1f1;
+  padding: 5px 10px;
+  margin-right: 5px;
+  text-decoration: none;
+  border-radius: 4px 4px 0 0;
+}
+
+.nav-tab-active {
+  background: #fff;
+  border-bottom: 1px solid #fff;
+  margin-bottom: -1px;
+}
+
+/* Color picker enhancement */
+.wp-picker-container .wp-color-result.button {
+  height: 30px;
+  margin: 0 6px 6px 0;
+}
+
+/* System info table */
+.headless-system-info {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.headless-system-info th,
+.headless-system-info td {
+  padding: 8px 12px;
+  border: 1px solid #dcdcde;
+  text-align: left;
+}
+
+.headless-system-info th {
+  background: #f6f7f7;
+  font-weight: 600;
+}
+
+.headless-system-info tr:nth-child(even) {
+  background: #f9f9f9;
+}
