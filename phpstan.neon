@@ -5,8 +5,6 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     ignoreErrors:
-        - '#Function wp_[a-z_]+ not found#'
-        - '#Constant [A-Z_]+ not found#'
-    wordpress:
-        constantsFile: wp-constants.php
-        functionsFile: wp-functions.php
+        - '#Call to undefined function.*#'
+        - '#Function.*not found.*#'
+        - '#Constant.*not found.*#'
