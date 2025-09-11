@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name: Headless WordPress Admin
  * Plugin URI: https://benitoanagua.me
@@ -26,11 +27,11 @@ if (!defined('ABSPATH')) {
 }
 
 // Definir constantes del plugin
-define('HEADLESS-WP-ADMIN_VERSION', '1.0.0');
-define('HEADLESS-WP-ADMIN_PLUGIN_FILE', __FILE__);
-define('HEADLESS-WP-ADMIN_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('HEADLESS-WP-ADMIN_PLUGIN_URL', plugin_dir_url(__FILE__));
-define('HEADLESS-WP-ADMIN_PLUGIN_BASENAME', plugin_basename(__FILE__));
+define('HEADLESS_WP_ADMIN_VERSION', '1.0.0');
+define('HEADLESS_WP_ADMIN_PLUGIN_FILE', __FILE__);
+define('HEADLESS_WP_ADMIN_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('HEADLESS_WP_ADMIN_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('HEADLESS_WP_ADMIN_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
 // Cargar Composer autoloader
 if (file_exists(__DIR__ . '/vendor/autoload.php')) {
@@ -38,7 +39,7 @@ if (file_exists(__DIR__ . '/vendor/autoload.php')) {
 }
 
 // Inicializar el plugin
-add_action('plugins_loaded', function() {
+add_action('plugins_loaded', function () {
     Core\Plugin::getInstance();
 });
 

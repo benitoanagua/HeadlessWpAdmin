@@ -36,6 +36,7 @@ pnpm-debug.log*
 # PHP
 composer.phar
 composer.lock
+pnpm-lock.yaml
 
 # WordPress
 wp-config-local.php
