@@ -38,29 +38,22 @@ class AdminPage
 
     public function addAdminMenu(): void
     {
+        // Menú principal - Configuración Headless
         add_menu_page(
-            __('Headless WordPress Admin', 'headless-wp-admin'),
-            __('Headless WordPress Admin', 'headless-wp-admin'),
+            __('Configuración Headless', 'headless-wp-admin'),
+            __('Headless WordPress', 'headless-wp-admin'),
             'manage_options',
-            'headless-wp-admin',
-            [$this, 'renderAdminPage'],
+            'headless-mode',
+            [$this, 'renderHeadlessConfigPage'],
             'dashicons-admin-generic',
             30
         );
 
-        add_submenu_page(
-            'headless-wp-admin',
-            __('Configuración Headless', 'headless-wp-admin'),
-            __('Configuración Headless', 'headless-wp-admin'),
-            'manage_options',
-            'headless-mode',
-            [$this, 'renderHeadlessConfigPage']
-        );
-    }
-
-    public function renderAdminPage(): void
-    {
-        echo '<div id="headless-wp-admin-admin-app"></div>';
+        // Renombrar el primer submenú para que no sea igual al menú principal
+        global $submenu;
+        if (isset($submenu['headless-mode'])) {
+            $submenu['headless-mode'][0][0] = __('Configuración', 'headless-wp-admin');
+        }
     }
 
     public function renderHeadlessConfigPage(): void
