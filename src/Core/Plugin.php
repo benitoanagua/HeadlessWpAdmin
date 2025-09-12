@@ -15,6 +15,7 @@ class Plugin
 {
     private static ?self $instance = null;
     private HeadlessHandler $headlessHandler;
+    private AssetManager $assetManager;
 
     private function __construct()
     {
@@ -34,13 +35,19 @@ class Plugin
         // Inicializar el manejador headless
         $this->headlessHandler = new HeadlessHandler();
 
+        // Inicializar asset manager
+        $this->assetManager = new AssetManager(
+            $this->headlessHandler,
+            HEADLESS_WP_ADMIN_VERSION,
+            HEADLESS_WP_ADMIN_PLUGIN_URL,
+            HEADLESS_WP_ADMIN_PLUGIN_DIR
+        );
+
         add_action('init', [$this, 'loadTextdomain']);
-        add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets']);
-        add_action('wp_enqueue_scripts', [$this, 'enqueueFrontendAssets']);
 
         // Inicializar componentes
         if (is_admin()) {
-            new AdminPage();
+            new AdminPage($this->headlessHandler);
         } else {
             new PublicInterface();
         }
@@ -61,10 +68,14 @@ class Plugin
 
     public function admin_notices(): void
     {
-        if (!current_user_can('manage_options')) return;
+        if (!current_user_can('manage_options')) {
+            return;
+        }
 
         $screen = get_current_screen();
-        if ($screen instanceof WP_Screen && $screen->id !== 'settings_page_headless-mode') return;
+        if ($screen instanceof WP_Screen && $screen->id !== 'toplevel_page_headless-mode') {
+            return;
+        }
 
         echo '<div class="notice notice-info">
             <h3>🚀 Headless WordPress Activo</h3>
@@ -88,7 +99,7 @@ class Plugin
         $wp_admin_bar->add_node([
             'id' => 'headless-config',
             'title' => '🚀 Headless',
-            'href' => admin_url('options-general.php?page=headless-mode')
+            'href' => admin_url('admin.php?page=headless-mode')
         ]);
     }
 
@@ -114,7 +125,7 @@ class Plugin
                 <div>Admin: ✅ Activo</div>
             </div>
             <p>
-                <a href="' . admin_url('options-general.php?page=headless-mode') . '" class="button button-primary">Configurar</a>
+                <a href="' . admin_url('admin.php?page=headless-mode') . '" class="button button-primary">Configurar</a>
                 <a href="' . home_url('/') . '" target="_blank" class="button">Ver Página Bloqueada</a>
             </p>
         </div>';
@@ -129,62 +140,61 @@ class Plugin
         );
     }
 
-    public function enqueueAdminAssets(): void
+    /**
+     * Obtener el AssetManager instance
+     */
+    public function get_asset_manager(): AssetManager
     {
-        wp_enqueue_script(
-            'headless-wp-admin-admin',
-            HEADLESS_WP_ADMIN_PLUGIN_URL . 'public/js/admin.js',
-            ['wp-api-fetch'],
-            HEADLESS_WP_ADMIN_VERSION,
-            true
-        );
-
-        wp_enqueue_style(
-            'headless-wp-admin-admin',
-            HEADLESS_WP_ADMIN_PLUGIN_URL . 'public/css/admin.css',
-            [],
-            HEADLESS_WP_ADMIN_VERSION
-        );
+        return $this->assetManager;
     }
 
-    public function enqueueFrontendAssets(): void
+    /**
+     * Obtener el HeadlessHandler instance
+     */
+    public function get_headless_handler(): HeadlessHandler
     {
-        wp_enqueue_script(
-            'headless-wp-admin-frontend',
-            HEADLESS_WP_ADMIN_PLUGIN_URL . 'public/js/frontend.js',
-            [],
-            HEADLESS_WP_ADMIN_VERSION,
-            true
-        );
-
-        wp_enqueue_style(
-            'headless-wp-admin-frontend',
-            HEADLESS_WP_ADMIN_PLUGIN_URL . 'public/css/frontend.css',
-            [],
-            HEADLESS_WP_ADMIN_VERSION
-        );
+        return $this->headlessHandler;
     }
 
     public static function activate(): void
     {
         // Código de activación
         flush_rewrite_rules();
+
+        // Crear opciones por defecto si no existen
+        $headlessHandler = new HeadlessHandler();
+        $default_settings = $headlessHandler->get_settings();
+
+        if (!get_option('headless_wp_settings')) {
+            update_option('headless_wp_settings', $default_settings);
+        }
     }
 
     public static function deactivate(): void
     {
         // Código de desactivación
         flush_rewrite_rules();
+
+        // Limpiar cron jobs si es necesario
+        $timestamp = wp_next_scheduled('headless_cleanup_event');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'headless_cleanup_event');
+        }
     }
 
     public static function uninstall(): void
     {
         // Código de desinstalación
         delete_option('headless_wp_settings');
+        delete_option('headless_wp_cache');
 
         // Limpiar cualquier cache relacionado
         if (function_exists('wp_cache_flush')) {
             wp_cache_flush();
         }
+
+        // Limpiar transients si es necesario
+        delete_transient('headless_api_status');
+        delete_transient('headless_settings_hash');
     }
 }

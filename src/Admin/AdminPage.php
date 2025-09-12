@@ -21,9 +21,9 @@ class AdminPage
     private SecurityTab $securityTab;
     private AdvancedTab $advancedTab;
 
-    public function __construct()
+    public function __construct(HeadlessHandler $headlessHandler)
     {
-        $this->headlessHandler = new HeadlessHandler();
+        $this->headlessHandler = $headlessHandler;
         $this->generalTab = new GeneralTab();
         $this->apisTab = new APIsTab();
         $this->blockedPageTab = new BlockedPageTab();
@@ -58,6 +58,10 @@ class AdminPage
 
     public function renderHeadlessConfigPage(): void
     {
+        // Cargar assets de WordPress necesarios
+        wp_enqueue_style('wp-color-picker');
+        wp_enqueue_script('wp-color-picker');
+
         if (isset($_POST['submit'])) {
             $this->save_settings();
         }
@@ -109,7 +113,6 @@ class AdminPage
         </div>
 
     <?php
-        $this->renderStyles();
         $this->renderScripts();
     }
 
@@ -118,106 +121,18 @@ class AdminPage
         register_setting('headless_wp_settings', 'headless_wp_settings');
     }
 
-    private function renderStyles(): void
-    {
-    ?>
-        <style>
-            .headless-config-section {
-                background: #fff;
-                border: 1px solid #ccd0d4;
-                border-radius: 4px;
-                margin: 20px 0;
-                padding: 20px;
-            }
-
-            .headless-config-section h3 {
-                margin-top: 0;
-                border-bottom: 1px solid #eee;
-                padding-bottom: 10px;
-            }
-
-            .headless-form-row {
-                margin: 15px 0;
-            }
-
-            .headless-form-row label {
-                display: block;
-                font-weight: 600;
-                margin-bottom: 5px;
-            }
-
-            .headless-form-row input[type="text"],
-            .headless-form-row input[type="url"],
-            .headless-form-row textarea,
-            .headless-form-row select {
-                width: 100%;
-                max-width: 600px;
-            }
-
-            .headless-form-row textarea {
-                height: 100px;
-            }
-
-            .headless-form-row .description {
-                font-style: italic;
-                color: #666;
-                font-size: 13px;
-            }
-
-            .headless-admin-footer {
-                background: #f1f1f1;
-                padding: 20px;
-                margin: 20px 0;
-                border-radius: 4px;
-            }
-
-            .color-preview {
-                display: inline-block;
-                width: 30px;
-                height: 30px;
-                border-radius: 4px;
-                border: 1px solid #ccc;
-                margin-left: 10px;
-                vertical-align: middle;
-            }
-
-            .headless-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-            }
-
-            @media (max-width: 768px) {
-                .headless-grid {
-                    grid-template-columns: 1fr;
-                }
-            }
-
-            .status-indicator {
-                display: inline-block;
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                margin-right: 8px;
-            }
-
-            .status-active {
-                background: #46b450;
-            }
-
-            .status-inactive {
-                background: #dc3232;
-            }
-        </style>
-    <?php
-    }
-
     private function renderScripts(): void
     {
     ?>
         <script>
             jQuery(document).ready(function($) {
-                $('.color-picker').wpColorPicker();
+                // Inicializar color picker
+                if (typeof $.fn.wpColorPicker === 'function') {
+                    $('.color-picker').wpColorPicker();
+                } else {
+                    console.warn('wpColorPicker no disponible, usando input type=color');
+                    $('.color-picker').attr('type', 'color');
+                }
 
                 $('#test-graphql').click(function() {
                     $.post(ajaxurl, {

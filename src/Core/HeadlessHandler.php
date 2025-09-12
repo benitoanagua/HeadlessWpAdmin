@@ -121,7 +121,7 @@ class HeadlessHandler
         $this->handle_blocked_request();
     }
 
-    private function is_allowed_request(): bool
+    public function is_allowed_request(): bool
     {
         $request_uri = $_SERVER['REQUEST_URI'] ?? '';
 
@@ -195,197 +195,58 @@ class HeadlessHandler
 
         header('Content-Type: text/html; charset=UTF-8');
 
-        // Construir estilos dinámicos
-        $custom_styles = $this->build_custom_styles($settings);
-
         $html = '<!DOCTYPE html>
-<html lang="' . get_locale() . '">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>' . esc_html($settings['blocked_page_title']) . ' - ' . esc_html($site_name) . '</title>
-    <meta name="robots" content="noindex,nofollow">
-    <style>' . $custom_styles . '</style>
-</head>
-<body>
-    <div class="container">
-        ' . $this->build_page_content($settings, $admin_url, $graphql_url, $site_name) . '
-    </div>
-</body>
-</html>';
+            <html lang="' . get_locale() . '">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>' . esc_html($settings['blocked_page_title']) . ' - ' . esc_html($site_name) . '</title>
+                <meta name="robots" content="noindex,nofollow">
+                <style>' . $this->get_blocked_page_css() . '</style>
+            </head>
+            <body>
+                <div class="container">
+                    ' . $this->build_page_content($settings, $admin_url, $graphql_url, $site_name) . '
+                </div>
+            </body>
+            </html>';
 
         echo $html;
         exit();
     }
 
-    /**
-     * @param array<string, mixed> $settings
-     */
-    private function build_custom_styles(array $settings): string
+    private function get_blocked_page_css(): string
     {
-        $bg_gradient = !empty($settings['blocked_page_background_gradient'])
-            ? $settings['blocked_page_background_gradient']
-            : 'linear-gradient(135deg, ' . $settings['blocked_page_background_color'] . ' 0%, #764ba2 100%)';
+        $css_file = HEADLESS_WP_ADMIN_PLUGIN_DIR . 'public/css/frontend/blocked-page.css';
 
-        $styles = '
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: ' . $bg_gradient . ';
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #2c3e50;
-            line-height: 1.6;
+        // Leer CSS base de forma segura
+        $base_css = '';
+        if (file_exists($css_file) && is_readable($css_file)) {
+            $base_css_content = file_get_contents($css_file);
+            $base_css = is_string($base_css_content) ? $base_css_content : '';
         }
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 700px;
-            width: 90%;
-            text-align: center;
-            animation: slideUp 0.6s ease-out;
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .logo { margin-bottom: 20px; }
-        .logo img { max-width: 150px; height: auto; border-radius: 10px; }
-        .icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            display: block;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
-        }
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            font-weight: 700;
-        }
-        .subtitle {
-            font-size: 1.3rem;
-            color: #7f8c8d;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-        .message {
-            font-size: 1.1rem;
-            color: #5a6c7d;
-            margin-bottom: 30px;
-            line-height: 1.7;
-        }
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        .status-item {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid #e9ecef;
-            transition: all 0.3s ease;
-        }
-        .status-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        .status {
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
-        .status.active { color: #28a745; }
-        .status.blocked { color: #dc3545; }
-        .endpoint {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            padding: 25px;
-            margin: 25px 0;
-            position: relative;
-            overflow: hidden;
-        }
-        .endpoint::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: ' . $bg_gradient . ';
-        }
-        .endpoint strong {
-            display: block;
-            margin-bottom: 15px;
-            color: #495057;
-            font-size: 1.1rem;
-        }
-        .endpoint code {
-            background: #e9ecef;
-            padding: 10px 15px;
-            border-radius: 8px;
-            color: #495057;
-            word-break: break-all;
-            font-size: 0.95rem;
-            display: block;
-            font-family: "SF Mono", Monaco, monospace;
-        }
-        .buttons {
-            margin-top: 30px;
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 15px 25px;
-            background: ' . $bg_gradient . ';
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            font-size: 1.rem;
-        }
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-            color: white;
-        }
-        .contact-info {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            border-left: 4px solid #007cba;
-        }
-        .footer {
-            margin-top: 30px;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        @media (max-width: 768px) {
-            .container { padding: 30px 20px; }
-            h1 { font-size: 2rem; }
-            .buttons { flex-direction: column; align-items: center; }
-            .btn { width: 100%; max-width: 280px; justify-content: center; }
-            .status-grid { grid-template-columns: 1fr; }
-        }
-        ' . $settings['blocked_page_custom_css'];
 
-        return $styles;
+        $settings = $this->get_settings();
+        $custom_css = $settings['blocked_page_custom_css'] ?? '';
+
+        // Procesar CSS personalizado de forma segura
+        if (!empty($custom_css) && is_string($custom_css)) {
+            // Sanitizar CSS
+            $sanitized_css = wp_strip_all_tags($custom_css);
+
+            // Eliminar caracteres de control de forma segura
+            $cleaned_css = preg_replace('/[\\0-\\x1F\\x7F]/', '', $sanitized_css);
+            if ($cleaned_css === null) {
+                // Si preg_replace falla, usar la versión sanitizada sin limpiar
+                $cleaned_css = $sanitized_css;
+            }
+
+            $custom_css = '/* Custom CSS */ ' . $cleaned_css;
+        } else {
+            $custom_css = '';
+        }
+
+        return $base_css . $custom_css;
     }
 
     /**
@@ -428,7 +289,7 @@ class HeadlessHandler
             }
 
             if ($this->get_setting('rest_api_enabled')) {
-                $content .= '<div class::status-item">
+                $content .= '<div class="status-item">
                     <div class="status active">✅ REST API</div>
                     <small>Disponible con configuración</small>
                 </div>';
