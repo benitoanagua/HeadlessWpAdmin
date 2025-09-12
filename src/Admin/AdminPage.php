@@ -8,6 +8,7 @@ use HeadlessWPAdmin\Admin\Tabs\BlockedPageTab;
 use HeadlessWPAdmin\Admin\Tabs\SecurityTab;
 use HeadlessWPAdmin\Admin\Tabs\AdvancedTab;
 use HeadlessWPAdmin\Core\HeadlessHandler;
+use HeadlessWPAdmin\Core\SettingsManager;
 
 /**
  * Clase para manejar la página de administración
@@ -15,15 +16,19 @@ use HeadlessWPAdmin\Core\HeadlessHandler;
 class AdminPage
 {
     private HeadlessHandler $headlessHandler;
+    private SettingsManager $settingsManager;
     private GeneralTab $generalTab;
     private APIsTab $apisTab;
     private BlockedPageTab $blockedPageTab;
     private SecurityTab $securityTab;
     private AdvancedTab $advancedTab;
 
-    public function __construct(HeadlessHandler $headlessHandler)
+    public function __construct(HeadlessHandler $headlessHandler, SettingsManager $settingsManager)
     {
         $this->headlessHandler = $headlessHandler;
+        $this->settingsManager = $settingsManager;
+
+        // Inicializar tabs sin pasar SettingsManager (no lo necesitan)
         $this->generalTab = new GeneralTab();
         $this->apisTab = new APIsTab();
         $this->blockedPageTab = new BlockedPageTab();
@@ -66,7 +71,7 @@ class AdminPage
             $this->save_settings();
         }
 
-        $settings = $this->headlessHandler->get_settings();
+        $settings = $this->settingsManager->get_settings();
         $active_tab = $_GET['tab'] ?? 'general';
 
 ?>
@@ -198,7 +203,8 @@ class AdminPage
             }
         }
 
-        update_option('headless_wp_settings', $new_settings);
+        // Usar SettingsManager para guardar
+        $this->settingsManager->update_settings($new_settings);
 
         echo '<div class="notice notice-success"><p>¡Configuración guardada correctamente!</p></div>';
     }
@@ -229,7 +235,8 @@ class AdminPage
             wp_send_json_error('Sin permisos');
         }
 
-        delete_option('headless_wp_settings');
+        // Usar SettingsManager para resetear
+        $this->settingsManager->delete_settings();
         wp_send_json_success('Configuración reseteada');
     }
 }

@@ -16,6 +16,7 @@ class Plugin
     private static ?self $instance = null;
     private HeadlessHandler $headlessHandler;
     private AssetManager $assetManager;
+    private SettingsManager $settingsManager;
 
     private function __construct()
     {
@@ -32,8 +33,11 @@ class Plugin
 
     private function init(): void
     {
-        // Inicializar el manejador headless
-        $this->headlessHandler = new HeadlessHandler();
+        // Inicializar SettingsManager primero
+        $this->settingsManager = new SettingsManager();
+
+        // Inicializar el manejador headless con SettingsManager
+        $this->headlessHandler = new HeadlessHandler($this->settingsManager);
 
         // Inicializar asset manager
         $this->assetManager = new AssetManager(
@@ -47,13 +51,13 @@ class Plugin
 
         // Inicializar componentes
         if (is_admin()) {
-            new AdminPage($this->headlessHandler);
+            new AdminPage($this->headlessHandler, $this->settingsManager);
         } else {
             new PublicInterface();
         }
 
         // Inicializar API endpoints
-        new SettingsEndpoint();
+        new SettingsEndpoint($this->settingsManager);
 
         // Configurar interfaz de administración
         $this->configure_admin_interface();
@@ -156,17 +160,26 @@ class Plugin
         return $this->headlessHandler;
     }
 
+    /**
+     * Obtener el SettingsManager instance
+     */
+    public function get_settings_manager(): SettingsManager
+    {
+        return $this->settingsManager;
+    }
+
     public static function activate(): void
     {
         // Código de activación
         flush_rewrite_rules();
 
         // Crear opciones por defecto si no existen
-        $headlessHandler = new HeadlessHandler();
+        $settingsManager = new SettingsManager();
+        $headlessHandler = new HeadlessHandler($settingsManager);
         $default_settings = $headlessHandler->get_settings();
 
-        if (!get_option('headless_wp_settings')) {
-            update_option('headless_wp_settings', $default_settings);
+        if (!$settingsManager->get_settings()) {
+            $settingsManager->update_settings($default_settings);
         }
     }
 
@@ -185,7 +198,9 @@ class Plugin
     public static function uninstall(): void
     {
         // Código de desinstalación
-        delete_option('headless_wp_settings');
+        $settingsManager = new SettingsManager();
+        $settingsManager->delete_settings();
+
         delete_option('headless_wp_cache');
 
         // Limpiar cualquier cache relacionado
