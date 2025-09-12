@@ -11,7 +11,11 @@ parameters:
     parallel:
         maximumNumberOfProcesses: 1
     tmpDir: /tmp/phpstan
-    excludes_analyse:
+    excludePaths:
         - '*/tests/*'
         - '*/vendor/*'
         - '*/node_modules/*'
+        - '*/wp-admin/*'
+        - '*/wp-includes/*'
+        - '*/wp-content/themes/*'
+        - '*/wp-content/uploads/*'

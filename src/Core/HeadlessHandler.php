@@ -2,21 +2,36 @@
 
 namespace HeadlessWPAdmin\Core;
 
+use HeadlessWPAdmin\Core\Services\RESTService;
+use HeadlessWPAdmin\Core\Services\GraphQLService;
+use HeadlessWPAdmin\Core\Services\SecurityService;
+use HeadlessWPAdmin\Core\Services\CleanupService;
+
 /**
- * Clase para manejar la lógica headless
+ * Clase principal para manejar la lógica headless
  */
 class HeadlessHandler
 {
     private string $option_name = 'headless_wp_settings';
 
-    /**
-     * @var array<string, mixed>
+    /** 
+     * @var array<string, mixed> Configuración predeterminada del plugin
      */
     private array $default_settings = [];
+
+    private RESTService $restService;
+    private GraphQLService $graphqlService;
+    private SecurityService $securityService;
+    private CleanupService $cleanupService;
 
     public function __construct()
     {
         $this->set_default_settings();
+        $this->restService = new RESTService($this);
+        $this->graphqlService = new GraphQLService($this);
+        $this->securityService = new SecurityService($this);
+        $this->cleanupService = new CleanupService($this);
+
         add_action('init', [$this, 'init_headless_mode'], 0);
         add_action('template_redirect', [$this, 'handle_frontend_requests'], 0);
     }
@@ -72,6 +87,9 @@ class HeadlessHandler
         return wp_parse_args($settings, $this->default_settings);
     }
 
+    /**
+     * @return mixed
+     */
     public function get_setting(string $key, mixed $default = null): mixed
     {
         $settings = $this->get_settings();
@@ -84,10 +102,10 @@ class HeadlessHandler
             error_log('Headless: Processing request: ' . ($_SERVER['REQUEST_URI'] ?? ''));
         }
 
-        $this->configure_rest_api();
-        $this->configure_graphql();
-        $this->configure_security();
-        $this->cleanup_wordpress_features();
+        $this->restService->configure();
+        $this->graphqlService->configure();
+        $this->securityService->configure();
+        $this->cleanupService->configure();
     }
 
     public function handle_frontend_requests(): void
@@ -463,205 +481,5 @@ class HeadlessHandler
         </div>';
 
         return $content;
-    }
-
-    private function configure_rest_api(): void
-    {
-        if (!$this->get_setting('rest_api_enabled')) {
-            add_filter('rest_enabled', '__return_false');
-            add_filter('rest_jsonp_enabled', '__return_false');
-
-            add_filter('rest_authentication_errors', function ($result) {
-                if (is_admin() || current_user_can('manage_options')) {
-                    return $result;
-                }
-                return new \WP_Error('rest_disabled', 'REST API deshabilitada en configuración headless', ['status' => 403]);
-            });
-
-            remove_action('wp_head', 'rest_output_link_wp_head');
-            remove_action('template_redirect', 'rest_output_link_header', 11);
-        } else {
-            // Configurar CORS para REST API
-            $this->setup_rest_cors();
-
-            // Autenticación requerida si está configurada
-            if ($this->get_setting('rest_api_auth_required')) {
-                $this->setup_rest_auth();
-            }
-
-            // Filtrar rutas permitidas
-            $this->filter_rest_routes();
-        }
-    }
-
-    private function setup_rest_cors(): void
-    {
-        add_action('rest_api_init', function () {
-            $origins = array_filter(explode("\n", $this->get_setting('rest_api_cors_origins')));
-
-            remove_filter('rest_pre_serve_request', 'rest_send_cors_headers');
-            add_filter('rest_pre_serve_request', function ($value) use ($origins) {
-                $origin = get_http_origin();
-                if ($origin && in_array($origin, $origins)) {
-                    header('Access-Control-Allow-Origin: ' . esc_url_raw($origin));
-                    header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
-                    header('Access-Control-Allow-Credentials: true');
-                    header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce');
-                }
-                return $value;
-            });
-        });
-    }
-
-    private function setup_rest_auth(): void
-    {
-        add_filter('rest_authentication_errors', function ($result) {
-            if (!empty($result)) {
-                return $result;
-            }
-
-            if (!is_user_logged_in() && !current_user_can('read')) {
-                return new \WP_Error('rest_forbidden', 'Autenticación requerida', ['status' => 401]);
-            }
-
-            return $result;
-        });
-    }
-
-    private function filter_rest_routes(): void
-    {
-        $allowed_routes = array_filter(explode("\n", $this->get_setting('rest_api_allowed_routes')));
-
-        if (!empty($allowed_routes)) {
-            add_filter('rest_pre_dispatch', function ($result, $request, $route) use ($allowed_routes) {
-                $allowed = false;
-                foreach ($allowed_routes as $allowed_route) {
-                    if (strpos($route, trim($allowed_route)) !== false) {
-                        $allowed = true;
-                        break;
-                    }
-                }
-
-                if (!$allowed) {
-                    return new \WP_Error('rest_route_forbidden', 'Ruta no permitida en configuración headless', ['status' => 403]);
-                }
-
-                return $result;
-            }, 10, 3);
-        }
-    }
-
-    private function configure_graphql(): void
-    {
-        if (!$this->get_setting('graphql_enabled')) {
-            // Deshabilitar GraphQL si está desactivado
-            add_filter('graphql_enabled', '__return_false');
-            return;
-        }
-
-        // CORS para GraphQL
-        if ($this->get_setting('graphql_cors_enabled')) {
-            add_filter('graphql_cors_allowed_origins', function ($origins) {
-                $custom_origins = array_filter(explode("\n", $this->get_setting('graphql_cors_origins')));
-                return array_merge($origins, $custom_origins);
-            });
-
-            add_filter('graphql_cors_allow_credentials', '__return_true');
-
-            add_filter('graphql_cors_allowed_headers', function ($headers) {
-                return array_merge($headers, [
-                    'Authorization',
-                    'Content-Type',
-                    'X-Requested-With',
-                    'X-WP-Nonce',
-                    'Cache-Control',
-                    'Accept-Language',
-                    'Apollo-Require-Preflight'
-                ]);
-            });
-        }
-
-        // Introspección
-        add_filter('graphql_introspection_enabled', function () {
-            return $this->get_setting('graphql_introspection');
-        });
-
-        // Tracing
-        add_filter('graphql_tracing_enabled', function () {
-            return $this->get_setting('graphql_tracing');
-        });
-
-        // Caching
-        if ($this->get_setting('graphql_caching')) {
-            add_filter('graphql_query_cache_enabled', '__return_true');
-        }
-    }
-
-    private function configure_security(): void
-    {
-        if ($this->get_setting('security_headers_enabled')) {
-            add_action('send_headers', function () {
-                if (!is_admin()) {
-                    header('X-Content-Type-Options: nosniff');
-                    header('X-Frame-Options: SAMEORIGIN');
-                    header('X-XSS-Protection: 1; mode=block');
-                    header('Referrer-Policy: strict-origin-when-cross-origin');
-                }
-            });
-        }
-
-        if ($this->get_setting('block_theme_access')) {
-            add_action('init', function () {
-                if (!is_admin() && !defined('DOING_AJAX')) {
-                    $request = $_SERVER['REQUEST_URI'] ?? '';
-                    if (preg_match('/\/(wp-content\/themes\/.*\.php)/', $request)) {
-                        wp_die('Acceso denegado', 'Error 403', ['response' => 403]);
-                    }
-                }
-            });
-        }
-    }
-
-    private function cleanup_wordpress_features(): void
-    {
-        if ($this->get_setting('disable_feeds')) {
-            add_action('do_feed', [$this, 'disable_feeds'], 1);
-            add_action('do_feed_rdf', [$this, 'disable_feeds'], 1);
-            add_action('do_feed_rss', [$this, 'disable_feeds'], 1);
-            add_action('do_feed_rss2', [$this, 'disable_feeds'], 1);
-            add_action('do_feed_atom', [$this, 'disable_feeds'], 1);
-        }
-
-        if ($this->get_setting('disable_sitemaps')) {
-            add_filter('wp_sitemaps_enabled', '__return_false');
-        }
-
-        if ($this->get_setting('disable_comments')) {
-            add_filter('comments_open', '__return_false', 20, 2);
-            add_filter('pings_open', '__return_false', 20, 2);
-            remove_menu_page('edit-comments.php');
-        }
-
-        if ($this->get_setting('clean_wp_head')) {
-            remove_action('wp_head', 'rsd_link');
-            remove_action('wp_head', 'wlwmanifest_link');
-            remove_action('wp_head', 'wp_generator');
-            remove_action('wp_head', 'wp_shortlink_wp_head');
-        }
-
-        if ($this->get_setting('disable_emojis')) {
-            remove_action('wp_head', 'print_emoji_detection_script', 7);
-            remove_action('wp_print_styles', 'print_emoji_styles');
-        }
-
-        if ($this->get_setting('disable_embeds')) {
-            remove_action('wp_head', 'wp_oembed_add_discovery_links');
-            remove_action('wp_head', 'wp_oembed_add_host_js');
-        }
-    }
-
-    public function disable_feeds(): void
-    {
-        wp_die('Feeds deshabilitados en configuración headless', 'Feeds No Disponibles', ['response' => 403]);
     }
 }
