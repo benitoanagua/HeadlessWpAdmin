@@ -1,6 +1,17 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
+import { resolve } from "path";
+import { generateMaterialTheme } from "./assets/js/themes/generate-material-theme.js";
+
+const themeConfig = {
+  outputDir: resolve(process.cwd(), "assets/css"),
+  seedColor: "#21759b",
+  variant: "CONTENT",
+  contrastLevel: 1,
+};
+
+generateMaterialTheme(themeConfig);
 
 export default defineConfig({
   plugins: [svelte(), tailwindcss()],
@@ -28,8 +39,11 @@ export default defineConfig({
       },
     },
   },
+
   server: {
     port: 3000,
     host: true,
   },
+
+  publicDir: "static",
 });

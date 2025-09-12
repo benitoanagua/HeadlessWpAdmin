@@ -12,6 +12,7 @@
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "devDependencies": {
+    "@material/material-color-utilities": "^0.3.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@tailwindcss/vite": "^4.0.0-alpha.20",
     "@tsconfig/svelte": "^5.0.0",
