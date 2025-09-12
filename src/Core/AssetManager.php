@@ -71,7 +71,7 @@ class AssetManager
         // Estilo principal del admin
         wp_enqueue_style(
             'headless-admin-main',
-            $this->plugin_url . 'public/css/admin/main.css',
+            $this->plugin_url . 'assets/css/admin/main.css',
             [],
             $this->version
         );
@@ -79,7 +79,7 @@ class AssetManager
         // Componentes del admin
         wp_enqueue_style(
             'headless-admin-components',
-            $this->plugin_url . 'public/css/admin/components.css',
+            $this->plugin_url . 'assets/css/admin/components.css',
             ['headless-admin-main'],
             $this->version
         );
@@ -87,7 +87,7 @@ class AssetManager
         // Formularios
         wp_enqueue_style(
             'headless-admin-forms',
-            $this->plugin_url . 'public/css/admin/forms.css',
+            $this->plugin_url . 'assets/css/admin/forms.css',
             ['headless-admin-main'],
             $this->version
         );
@@ -100,7 +100,7 @@ class AssetManager
     {
         wp_enqueue_script(
             'headless-admin-main',
-            $this->plugin_url . 'public/js/admin/main.js',
+            $this->plugin_url . 'assets/js/admin/main.js',
             ['jquery', 'wp-color-picker'],
             $this->version,
             true
@@ -141,7 +141,7 @@ class AssetManager
         // Estilo base de página bloqueada
         wp_enqueue_style(
             'headless-blocked-page',
-            $this->plugin_url . 'public/css/frontend/blocked-page.css',
+            $this->plugin_url . 'assets/css/frontend/blocked-page.css',
             [],
             $this->version . '-' . $css_hash
         );

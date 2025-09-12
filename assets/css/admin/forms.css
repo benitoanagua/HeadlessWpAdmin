@@ -1,0 +1,125 @@
+/* forms.css - Estilos de formularios del admin headless */
+
+/* Checkboxes y radios mejorados */
+.headless-form-row input[type="checkbox"],
+.headless-form-row input[type="radio"] {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.headless-form-row label input[type="checkbox"],
+.headless-form-row label input[type="radio"] {
+  margin-right: 8px;
+}
+
+/* Grupos de campos */
+.headless-field-group {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: var(--headless-border-radius, 8px);
+  border: 1px solid var(--headless-border-color, #ccd0d4);
+}
+
+.headless-field-group legend {
+  font-weight: 600;
+  color: #1d2327;
+  padding: 0 10px;
+  margin-bottom: 10px;
+}
+
+/* Botones personalizados */
+.headless-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--headless-primary, #007cba);
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.headless-btn:hover {
+  background: var(--headless-primary-hover, #006ba1);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.headless-btn-secondary {
+  background: #f0f0f0;
+  color: #1d2327;
+}
+
+.headless-btn-secondary:hover {
+  background: #e0e0e0;
+  color: #1d2327;
+}
+
+.headless-btn-danger {
+  background: var(--headless-error, #dc3232);
+}
+
+.headless-btn-danger:hover {
+  background: #c92c2c;
+}
+
+/* Estados de validación */
+.headless-form-row .invalid {
+  border-color: var(--headless-error, #dc3232);
+}
+
+.headless-form-row .valid {
+  border-color: var(--headless-success, #46b450);
+}
+
+.headless-validation-message {
+  font-size: 12px;
+  color: var(--headless-error, #dc3232);
+  margin-top: 5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .headless-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .headless-form-row input[type="text"],
+  .headless-form-row input[type="url"],
+  .headless-form-row textarea,
+  .headless-form-row select {
+    max-width: 100%;
+  }
+
+  .headless-field-group {
+    padding: 10px;
+  }
+
+  .headless-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Animaciones para formularios */
+.headless-form-row {
+  transition: all 0.3s ease;
+}
+
+.headless-form-row:focus-within {
+  border-left-color: var(--headless-primary, #007cba);
+  background: #f6f7f7;
+}
+
+/* Placeholders mejorados */
+.headless-form-row input::placeholder,
+.headless-form-row textarea::placeholder {
+  color: #a7aaad;
+  font-style: italic;
+}

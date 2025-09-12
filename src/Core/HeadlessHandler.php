@@ -217,7 +217,7 @@ class HeadlessHandler
 
     private function get_blocked_page_css(): string
     {
-        $css_file = HEADLESS_WP_ADMIN_PLUGIN_DIR . 'public/css/frontend/blocked-page.css';
+        $css_file = HEADLESS_WP_ADMIN_PLUGIN_DIR . 'assets/css/frontend/blocked-page.css';
 
         // Leer CSS base de forma segura
         $base_css = '';

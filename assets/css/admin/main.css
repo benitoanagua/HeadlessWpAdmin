@@ -1,0 +1,37 @@
+/* main.css - Estilos base del admin headless */
+
+.headless-config-section {
+  background: #fff;
+  border: 1px solid #ccd0d4;
+  border-radius: 4px;
+  margin: 20px 0;
+  padding: 20px;
+}
+
+.headless-config-section h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  color: #1d2327;
+}
+
+.headless-admin-footer {
+  background: #f1f1f1;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 4px;
+  border: 1px solid #dcdcde;
+}
+
+/* Variables CSS para el tema */
+:root {
+  --headless-primary: #007cba;
+  --headless-primary-hover: #006ba1;
+  --headless-success: #46b450;
+  --headless-warning: #ffb900;
+  --headless-error: #dc3232;
+  --headless-border-radius: 8px;
+  --headless-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --headless-border-color: #ccd0d4;
+  --headless-bg-light: #f6f7f7;
+}
