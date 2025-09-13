@@ -1,9 +1,0 @@
-@import "tailwindcss";
-
-@import "./admin/main.css";
-@import "./admin/forms.css";
-@import "./admin/components.css";
-
-@import "./frontend/blocked-page.css";
-
-@source '../../src/**/*.php';

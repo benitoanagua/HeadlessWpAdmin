@@ -1,4 +1,3 @@
-//vite.config.js
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
@@ -17,26 +16,20 @@ generateMaterialTheme(themeConfig);
 export default defineConfig({
   plugins: [svelte(), tailwindcss()],
   build: {
-    manifest: true,
     outDir: "public",
     rollupOptions: {
-      input: [
-        "assets/css/app.css",
-        "assets/js/admin/main.js",
-        "assets/js/frontend/main.js",
-      ],
+      input: {
+        main: "assets/js/main.js",
+      },
       output: {
         entryFileNames: "assets/[name].js",
+        assetFileNames: "assets/[name].[ext]",
         chunkFileNames: "assets/[name].js",
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name && assetInfo.name.endsWith(".css")) {
-            return "assets/app.css";
-          }
-          return "assets/[name].[hash][extname]";
-        },
       },
     },
+    cssCodeSplit: false, // fuerza a que todo el CSS se bundle en un solo archivo
   },
+  publicDir: false,
   server: {
     port: 3000,
     host: true,
