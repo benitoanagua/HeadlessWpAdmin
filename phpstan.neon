@@ -11,6 +11,7 @@ parameters:
     parallel:
         maximumNumberOfProcesses: 1
     tmpDir: /tmp/phpstan
+    treatPhpDocTypesAsCertain: false
     excludePaths:
         - '*/tests/*'
         - '*/vendor/*'

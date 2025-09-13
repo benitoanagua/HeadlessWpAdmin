@@ -204,9 +204,9 @@ class HeadlessHandler
     private function isSpecialContext(): bool
     {
         return is_admin() ||
-            (defined('DOING_AJAX') && DOING_AJAX) ||
-            (defined('DOING_CRON') && DOING_CRON) ||
-            (defined('WP_CLI') && WP_CLI) ||
+            (defined('DOING_AJAX') && constant('DOING_AJAX')) ||
+            (defined('DOING_CRON') && constant('DOING_CRON')) ||
+            (defined('WP_CLI') && constant('WP_CLI')) ||
             $this->isRestRequest() ||
             $this->isGraphqlRequest();
     }
