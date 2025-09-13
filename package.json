@@ -13,18 +13,18 @@
   },
   "devDependencies": {
     "@material/material-color-utilities": "^0.3.0",
-    "@sveltejs/vite-plugin-svelte": "^3.0.0",
-    "@tailwindcss/vite": "^4.0.0-alpha.20",
-    "@tsconfig/svelte": "^5.0.0",
-    "svelte": "^4.2.0",
-    "svelte-check": "^3.6.0",
-    "tailwindcss": "^4.0.0-alpha.20",
-    "tslib": "^2.4.1",
-    "typescript": "^5.0.0",
-    "vite": "^5.0.0"
+    "@sveltejs/vite-plugin-svelte": "^6.2.0",
+    "@tailwindcss/vite": "^4.1.13",
+    "@tsconfig/svelte": "^5.0.5",
+    "svelte": "^5.38.10",
+    "svelte-check": "^4.3.1",
+    "tailwindcss": "^4.1.13",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.5"
   },
   "dependencies": {
-    "@wordpress/api-fetch": "^6.44.0",
-    "@wordpress/i18n": "^4.47.0"
+    "@wordpress/api-fetch": "^7.30.0",
+    "@wordpress/i18n": "^6.3.0"
   }
 }

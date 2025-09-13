@@ -1,37 +1,65 @@
-/* main.css - Estilos base del admin headless */
-
+/* Configuration Sections */
 .headless-config-section {
-  background: #fff;
-  border: 1px solid #ccd0d4;
-  border-radius: 4px;
-  margin: 20px 0;
-  padding: 20px;
+  --apply: bg-surface border border-outlineVariant rounded-xs my-5 p-5;
 }
 
 .headless-config-section h3 {
-  margin-top: 0;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-  color: #1d2327;
+  --apply: mt-0 border-b border-outlineVariant pb-2 text-onSurface;
 }
 
+/* Admin Footer */
 .headless-admin-footer {
-  background: #f1f1f1;
-  padding: 20px;
-  margin: 20px 0;
-  border-radius: 4px;
-  border: 1px solid #dcdcde;
+  --apply: bg-surfaceContainerLow p-5 my-5 rounded-xs border
+    border-outlineVariant;
 }
 
-/* Variables CSS para el tema */
-:root {
-  --headless-primary: #007cba;
-  --headless-primary-hover: #006ba1;
-  --headless-success: #46b450;
-  --headless-warning: #ffb900;
-  --headless-error: #dc3232;
-  --headless-border-radius: 8px;
-  --headless-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  --headless-border-color: #ccd0d4;
-  --headless-bg-light: #f6f7f7;
+/* Admin Responsive Design */
+@media (max-width: 1024px) {
+  .headless-settings-form {
+    --apply: max-w-full mx-4;
+  }
+
+  .headless-nav-tabs {
+    --apply: overflow-x-auto;
+  }
+
+  .headless-nav-tab {
+    --apply: whitespace-nowrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .headless-settings-section {
+    --apply: p-4;
+  }
+
+  .headless-action-bar {
+    --apply: flex-col gap-2;
+  }
+
+  .headless-cards-grid {
+    --apply: grid-cols-1;
+  }
+
+  .headless-table {
+    --apply: text-sm;
+  }
+
+  .headless-table th,
+  .headless-table td {
+    --apply: p-2;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .headless-action-bar,
+  .headless-nav-tabs {
+    --apply: hidden;
+  }
+
+  .headless-config-section,
+  .headless-settings-section {
+    --apply: border-0 shadow-none;
+  }
 }

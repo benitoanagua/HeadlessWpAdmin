@@ -1,125 +1,88 @@
-/* forms.css - Estilos de formularios del admin headless */
-
-/* Checkboxes y radios mejorados */
+/* Enhanced checkboxes and radio buttons */
 .headless-form-row input[type="checkbox"],
 .headless-form-row input[type="radio"] {
-  margin-right: 8px;
-  vertical-align: middle;
+  --apply: mr-2 align-middle accent-primary;
 }
 
 .headless-form-row label input[type="checkbox"],
 .headless-form-row label input[type="radio"] {
-  margin-right: 8px;
+  --apply: mr-2;
 }
 
-/* Grupos de campos */
+/* Field Groups */
 .headless-field-group {
-  margin-bottom: 20px;
-  padding: 15px;
-  background: #f9f9f9;
-  border-radius: var(--headless-border-radius, 8px);
-  border: 1px solid var(--headless-border-color, #ccd0d4);
+  --apply: mb-5 p-4 bg-surfaceContainer rounded-sm border border-outlineVariant;
 }
 
 .headless-field-group legend {
-  font-weight: 600;
-  color: #1d2327;
-  padding: 0 10px;
-  margin-bottom: 10px;
+  --apply: font-semibold text-onSurface px-2 mb-2;
 }
 
-/* Botones personalizados */
+/* Material Design 3 Buttons */
 .headless-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: var(--headless-primary, #007cba);
-  color: white;
-  text-decoration: none;
-  border: none;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  --apply: inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-onPrimary
+    font-semibold rounded-xs cursor-pointer transition-all duration-200
+    shadow-elevation-1;
 }
 
 .headless-btn:hover {
-  background: var(--headless-primary-hover, #006ba1);
-  color: white;
-  transform: translateY(-1px);
+  --apply: shadow-elevation-2 -translate-y-0.5 bg-primary/90;
 }
 
 .headless-btn-secondary {
-  background: #f0f0f0;
-  color: #1d2327;
+  --apply: bg-surfaceContainer text-onSurface border border-outline;
 }
 
 .headless-btn-secondary:hover {
-  background: #e0e0e0;
-  color: #1d2327;
+  --apply: bg-surfaceContainerHigh;
 }
 
 .headless-btn-danger {
-  background: var(--headless-error, #dc3232);
+  --apply: bg-error text-onError;
 }
 
 .headless-btn-danger:hover {
-  background: #c92c2c;
+  --apply: bg-error/90;
 }
 
-/* Estados de validación */
+/* Validation States */
 .headless-form-row .invalid {
-  border-color: var(--headless-error, #dc3232);
+  --apply: border-error ring-2 ring-error/20;
 }
 
 .headless-form-row .valid {
-  border-color: var(--headless-success, #46b450);
+  --apply: border-tertiary ring-2 ring-tertiary/20;
 }
 
 .headless-validation-message {
-  font-size: 12px;
-  color: var(--headless-error, #dc3232);
-  margin-top: 5px;
+  --apply: text-xs text-error mt-1;
 }
 
-/* Responsive */
+/* Responsive Forms */
 @media (max-width: 768px) {
-  .headless-grid {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-
   .headless-form-row input[type="text"],
   .headless-form-row input[type="url"],
+  .headless-form-row input[type="email"],
+  .headless-form-row input[type="password"],
   .headless-form-row textarea,
   .headless-form-row select {
-    max-width: 100%;
+    --apply: max-w-full;
   }
 
   .headless-field-group {
-    padding: 10px;
+    --apply: p-2;
   }
 
   .headless-btn {
-    width: 100%;
-    justify-content: center;
+    --apply: w-full justify-center;
   }
 }
 
-/* Animaciones para formularios */
+/* Form animations */
 .headless-form-row {
-  transition: all 0.3s ease;
+  --apply: transition-all duration-300;
 }
 
 .headless-form-row:focus-within {
-  border-left-color: var(--headless-primary, #007cba);
-  background: #f6f7f7;
-}
-
-/* Placeholders mejorados */
-.headless-form-row input::placeholder,
-.headless-form-row textarea::placeholder {
-  color: #a7aaad;
-  font-style: italic;
+  --apply: border-primary bg-surfaceContainerLow;
 }

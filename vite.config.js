@@ -1,3 +1,4 @@
+//vite.config.js
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
@@ -16,34 +17,30 @@ generateMaterialTheme(themeConfig);
 export default defineConfig({
   plugins: [svelte(), tailwindcss()],
   build: {
+    manifest: true,
     outDir: "public",
     rollupOptions: {
-      input: {
-        admin: "assets/js/admin.js",
-        frontend: "assets/js/frontend.js",
-      },
+      input: [
+        "assets/css/app.css",
+        // "assets/js/app.js",
+      ],
       output: {
-        entryFileNames: "js/[name].js",
-        chunkFileNames: "js/[name]-[hash].js",
+        // Deshabilitar hashing para nombres de archivo fijos
+        entryFileNames: "assets/[name].js",
+        chunkFileNames: "assets/[name].js",
         assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split(".");
-          const ext = info[info.length - 1];
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
-            return `images/[name].[ext]`;
+          // Para archivos CSS
+          if (assetInfo.name && assetInfo.name.endsWith(".css")) {
+            return "assets/[name][extname]";
           }
-          if (/css/i.test(ext)) {
-            return `css/[name].[ext]`;
-          }
-          return `[name].[ext]`;
+          // Para otros assets (imágenes, fuentes, etc.)
+          return "assets/[name].[hash][extname]";
         },
       },
     },
   },
-
   server: {
     port: 3000,
     host: true,
   },
-
-  publicDir: "static",
 });

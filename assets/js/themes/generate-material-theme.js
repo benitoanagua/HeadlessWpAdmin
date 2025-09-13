@@ -132,7 +132,9 @@ export function generateMaterialTheme(config = {}) {
     const darkColors = extractColors(darkScheme);
 
     // Generar CSS con mejor formato y mayor compatibilidad
-    const cssContent = `@theme {
+    const cssContent = `@import "tailwindcss";
+    
+@theme {
 ${Object.entries(lightColors)
   .map(([k, v]) => `  --color-${k}: ${v};`)
   .join("\n")}
@@ -151,7 +153,7 @@ ${Object.entries(darkColors)
     }
 
     // Escribir archivo CSS
-    const outputFile = resolve(outputDir, "material-tokens.css");
+    const outputFile = resolve(outputDir, "tokens.css");
     writeFileSync(outputFile, cssContent, "utf8");
 
     console.log(`✅ Material tokens generated successfully`);

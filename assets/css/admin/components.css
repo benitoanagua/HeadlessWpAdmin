@@ -1,129 +1,119 @@
-/* components.css - Componentes del admin headless */
-
+/* Form Components using Tailwind 4 classes directly */
 .headless-form-row {
-  margin: 15px 0;
-  padding: 15px;
-  background: #f9f9f9;
-  border-radius: var(--headless-border-radius, 8px);
-  border-left: 4px solid var(--headless-primary, #007cba);
+  --apply: my-4 p-4 bg-surfaceContainer rounded-xs border-l-4 border-primary
+    transition-all duration-300;
+}
+
+.headless-form-row:focus-within {
+  --apply: bg-surfaceContainerHigh;
 }
 
 .headless-form-row label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 5px;
-  color: #1d2327;
+  --apply: block font-semibold mb-1 text-onSurface text-sm;
 }
 
 .headless-form-row input[type="text"],
 .headless-form-row input[type="url"],
 .headless-form-row input[type="email"],
 .headless-form-row input[type="password"],
-.headless-form-row textarea,
 .headless-form-row select {
-  width: 100%;
-  max-width: 600px;
-  padding: 8px 12px;
-  border: 1px solid var(--headless-border-color, #ccd0d4);
-  border-radius: 4px;
-  font-size: 14px;
-  line-height: 1.4;
+  --apply: w-full max-w-2xl px-3 py-2 border border-outline rounded-xs text-sm
+    leading-normal bg-surface text-onSurface;
+}
+
+.headless-form-row input[type="text"]:focus,
+.headless-form-row input[type="url"]:focus,
+.headless-form-row input[type="email"]:focus,
+.headless-form-row input[type="password"]:focus,
+.headless-form-row select:focus {
+  --apply: outline-none border-primary ring-2 ring-primary/20;
+}
+
+.headless-form-row input[type="text"]::placeholder,
+.headless-form-row input[type="url"]::placeholder,
+.headless-form-row input[type="email"]::placeholder,
+.headless-form-row input[type="password"]::placeholder {
+  --apply: text-onSurfaceVariant/60 italic;
 }
 
 .headless-form-row textarea {
-  height: 100px;
-  resize: vertical;
+  --apply: w-full max-w-2xl px-3 py-2 border border-outline rounded-xs text-sm
+    leading-normal bg-surface text-onSurface h-24 resize-y;
+}
+
+.headless-form-row textarea:focus {
+  --apply: outline-none border-primary ring-2 ring-primary/20;
+}
+
+.headless-form-row textarea::placeholder {
+  --apply: text-onSurfaceVariant/60 italic;
 }
 
 .headless-form-row .description {
-  font-style: italic;
-  color: #666;
-  font-size: 13px;
-  margin-top: 5px;
+  --apply: italic text-onSurfaceVariant text-xs mt-1;
 }
 
 .headless-form-row .description code {
-  background: #f0f0f0;
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-family: Consolas, Monaco, monospace;
+  --apply: bg-surfaceVariant px-1 py-0.5 rounded-xs font-mono text-xs;
 }
 
+/* Color Preview Component */
 .color-preview {
-  display: inline-block;
-  width: 30px;
-  height: 30px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  margin-left: 10px;
-  vertical-align: middle;
+  --apply: inline-block w-8 h-8 rounded-xs border border-outline ml-2
+    align-middle;
 }
 
+/* Grid Layout */
 .headless-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  --apply: grid grid-cols-2 gap-5;
 }
 
+@media (max-width: 768px) {
+  .headless-grid {
+    --apply: grid-cols-1 gap-4;
+  }
+}
+
+/* Status Indicators */
 .status-indicator {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-right: 8px;
+  --apply: inline-block w-3 h-3 rounded-full mr-2;
 }
 
 .status-active {
-  background: var(--headless-success, #46b450);
+  --apply: bg-tertiary;
 }
 
 .status-inactive {
-  background: var(--headless-error, #dc3232);
+  --apply: bg-error;
 }
 
-/* Cards para estadísticas */
+/* Stat Cards */
 .headless-stat-card {
-  background: #fff;
-  border: 1px solid #dcdcde;
-  border-radius: var(--headless-border-radius, 8px);
-  padding: 20px;
-  text-align: center;
-  box-shadow: var(--headless-box-shadow, 0 2px 6px rgba(0, 0, 0, 0.1));
+  --apply: bg-surface border border-outlineVariant rounded-sm p-5 text-center
+    shadow-elevation-1;
 }
 
 .headless-stat-card h3 {
-  margin: 0 0 10px 0;
-  color: #1d2327;
-  font-size: 16px;
+  --apply: m-0 mb-2 text-onSurface text-base font-medium;
 }
 
 .headless-stat-value {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--headless-primary, #007cba);
+  --apply: text-3xl font-bold text-primary;
 }
 
 /* Badges */
 .headless-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
+  --apply: inline-block px-2 py-1 rounded-full text-xs font-semibold uppercase;
 }
 
 .headless-badge-success {
-  background: var(--headless-success, #46b450);
-  color: white;
+  --apply: bg-tertiary text-onTertiary;
 }
 
 .headless-badge-warning {
-  background: var(--headless-warning, #ffb900);
-  color: #1d2327;
+  --apply: bg-errorContainer text-onErrorContainer;
 }
 
 .headless-badge-error {
-  background: var(--headless-error, #dc3232);
-  color: white;
+  --apply: bg-error text-onError;
 }

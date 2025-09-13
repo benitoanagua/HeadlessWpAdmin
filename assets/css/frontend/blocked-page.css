@@ -1,267 +1,217 @@
-/* blocked-page.css - Estilos para la página bloqueada headless */
-
+/* Global Reset and Base Styles */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  --apply: m-0 p-0 box-border;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, sans-serif;
-  background: var(
-    --headless-gradient,
-    linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+  --apply: font-sans bg-background text-onBackground min-h-screen flex items-center justify-center leading-normal;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-tertiary) 100%
   );
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #2c3e50;
-  line-height: 1.6;
 }
 
+/* Main Container */
 .container {
-  background: var(--headless-container-bg, rgba(255, 255, 255, 0.95));
-  backdrop-filter: blur(10px);
-  border-radius: var(--headless-border-radius, 20px);
-  padding: 40px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  max-width: 700px;
-  width: 90%;
-  text-align: center;
-  animation: slideUp 0.6s ease-out;
+  --apply: bg-surface/95 backdrop-blur-md rounded-xl p-10 shadow-elevation-3 max-w-2xl w-11/12 text-center animate-slide-up;
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* Logo */
 .logo {
-  margin-bottom: 20px;
+  --apply: mb-5;
 }
 
 .logo img {
-  max-width: 150px;
-  height: auto;
-  border-radius: 10px;
+  --apply: max-w-40 h-auto rounded-md;
 }
 
+/* Icon */
 .icon {
-  font-size: var(--headless-icon-size, 80px);
-  margin-bottom: 20px;
-  display: block;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  --apply: text-8xl mb-5 block filter drop-shadow-md;
 }
 
+/* Typography */
 h1 {
-  font-size: 2.5rem;
-  margin-bottom: 15px;
-  color: #2c3e50;
-  font-weight: 700;
+  --apply: text-5xl mb-4 text-onSurface font-bold;
 }
 
 .subtitle {
-  font-size: 1.3rem;
-  color: #7f8c8d;
-  margin-bottom: 20px;
-  font-weight: 500;
+  --apply: text-xl text-onSurfaceVariant mb-5 font-medium;
 }
 
 .message {
-  font-size: 1.1rem;
-  color: #5a6c7d;
-  margin-bottom: 30px;
-  line-height: 1.7;
+  --apply: text-lg text-onSurfaceVariant/80 mb-8 leading-relaxed;
 }
 
+/* Status Grid */
 .status-grid {
-  display: grid;
+  --apply: grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-auto gap-5 my-8;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 20px;
-  margin: 30px 0;
 }
 
 .status-item {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 15px;
-  border: 2px solid #e9ecef;
-  transition: all 0.3s ease;
-}
-
-.status-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  --apply: bg-surfaceContainerLow p-5 rounded-lg border-2 border-outlineVariant hover:-translate-y-1 hover:shadow-elevation-2 transition-all duration-300;
 }
 
 .status {
-  font-weight: bold;
-  font-size: 1.1em;
-  margin-bottom: 5px;
+  --apply: font-bold text-lg mb-1;
 }
 
 .status.active {
-  color: #28a745;
+  --apply: text-tertiary;
 }
 
 .status.blocked {
-  color: #dc3545;
+  --apply: text-error;
 }
 
+/* Endpoint Display */
 .endpoint {
-  background: #f8f9fa;
-  border: 2px solid #e9ecef;
-  border-radius: 15px;
-  padding: 25px;
-  margin: 25px 0;
-  position: relative;
-  overflow: hidden;
+  --apply: bg-surfaceContainerLow border-2 border-outlineVariant rounded-lg p-6 my-6 relative overflow-hidden;
 }
 
 .endpoint::before {
   content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(
-    --headless-gradient,
-    linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+  --apply: absolute top-0 left-0 w-1 h-full;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-tertiary) 100%
   );
 }
 
 .endpoint strong {
-  display: block;
-  margin-bottom: 15px;
-  color: #495057;
-  font-size: 1.1rem;
+  --apply: block mb-4 text-onSurface text-lg;
 }
 
 .endpoint code {
-  background: #e9ecef;
-  padding: 10px 15px;
-  border-radius: 8px;
-  color: #495057;
-  word-break: break-all;
-  font-size: 0.95rem;
-  display: block;
-  font-family: "SF Mono", Monaco, monospace;
+  --apply: bg-surfaceVariant p-3 rounded-md text-onSurface break-all text-sm block font-mono;
 }
 
+/* Buttons */
 .buttons {
-  margin-top: 30px;
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  flex-wrap: wrap;
+  --apply: mt-8 flex gap-4 justify-center flex-wrap;
 }
 
 .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 15px 25px;
-  background: var(
-    --headless-gradient,
-    linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+  --apply: inline-flex items-center gap-2 px-6 py-4 text-onPrimary font-semibold rounded-md transition-all duration-300 shadow-elevation-1 text-base;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-tertiary) 100%
   );
-  color: white;
-  text-decoration: none;
-  border-radius: 12px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-  font-size: 1rem;
+  box-shadow: 0 4px 15px var(--color-primary) / 30;
 }
 
 .btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  color: white;
+  --apply: -translate-y-1 shadow-elevation-3;
+  box-shadow: 0 8px 25px var(--color-primary) / 40;
 }
 
+/* Contact Info */
 .contact-info {
-  margin-top: 30px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 15px;
-  border-left: 4px solid #007cba;
+  --apply: mt-8 p-5 bg-surfaceContainerLow rounded-lg border-l-4 border-primary;
 }
 
+/* Footer */
 .footer {
-  margin-top: 30px;
-  font-size: 0.9rem;
-  color: #6c757d;
+  --apply: mt-8 text-sm text-onSurfaceVariant;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .container {
-    padding: 30px 20px;
-  }
-
-  h1 {
-    font-size: 2rem;
-  }
-
-  .buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .btn {
-    width: 100%;
-    max-width: 280px;
-    justify-content: center;
-  }
-
-  .status-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .endpoint {
-    padding: 20px;
-  }
-
-  .status-item {
-    padding: 15px;
-  }
-}
-
-/* Estados de carga */
+/* Loading States */
 .loading {
-  opacity: 0.7;
-  pointer-events: none;
+  --apply: opacity-70 pointer-events-none relative;
 }
 
 .loading::after {
   content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #007cba;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+  --apply: absolute top-1/2 left-1/2 w-5 h-5 -mt-2.5 -ml-2.5 border-2 border-surface border-t-primary rounded-full animate-spin;
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    --apply: p-8;
   }
-  100% {
-    transform: rotate(360deg);
+
+  h1 {
+    --apply: text-3xl;
+  }
+
+  .buttons {
+    --apply: flex-col items-center;
+  }
+
+  .btn {
+    --apply: w-full max-w-xs justify-center;
+  }
+
+  .status-grid {
+    --apply: grid-cols-1;
+  }
+
+  .endpoint {
+    --apply: p-5;
+  }
+
+  .status-item {
+    --apply: p-4;
+  }
+
+  .fab {
+    --apply: bottom-4 right-4;
+  }
+
+  .snackbar {
+    --apply: left-2 right-2;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    --apply: p-6;
+  }
+
+  .icon {
+    --apply: text-6xl;
+  }
+
+  h1 {
+    --apply: text-2xl;
+  }
+
+  .subtitle {
+    --apply: text-lg;
+  }
+
+  .message {
+    --apply: text-base;
+  }
+}
+
+/* Dark theme specific adjustments */
+@media (prefers-color-scheme: dark) {
+  .btn {
+    box-shadow: 0 4px 15px var(--color-primary) / 20;
+  }
+
+  .btn:hover {
+    box-shadow: 0 8px 25px var(--color-primary) / 30;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .container {
+    --apply: animate-none;
+  }
+
+  .status-item:hover {
+    --apply: transform-none;
+  }
+
+  .btn:hover {
+    --apply: transform-none;
   }
 }
