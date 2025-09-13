@@ -182,15 +182,15 @@
 
 <style>
   .admin-container {
-    --apply: p-6 bg-white rounded-lg shadow-sm;
+    --apply: p-6 bg-surface rounded-xl shadow-sm;
   }
 
   .admin-header {
-    --apply: mb-6 pb-4 border-b border-gray-200;
+    --apply: mb-6 pb-4 border-b border-outlineVariant;
   }
 
   .admin-title {
-    --apply: text-2xl font-semibold text-gray-900 mb-4;
+    --apply: text-2xl font-semibold text-onSurface mb-4;
   }
 
   .admin-nav {
@@ -198,14 +198,16 @@
   }
 
   .admin-nav button {
-    --apply: px-4 py-2 rounded-md text-sm font-medium transition-colors;
+    --apply: px-4 py-2 rounded-full text-sm font-medium transition-colors
+      state-layer;
   }
 
   .admin-nav button.active {
-    --apply: bg-blue-100 text-blue-700;
+    --apply: bg-primaryContainer text-onPrimaryContainer;
   }
 
   .admin-nav button:not(.active) {
-    --apply: text-gray-600 hover: text-gray-900 hover: bg-gray-100;
+    --apply: text-onSurfaceVariant hover: text-onSurface hover:
+      bg-surfaceContainerLow;
   }
 </style>

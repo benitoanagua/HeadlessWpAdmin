@@ -1,51 +1,92 @@
 <?php
 
+/**
+ * Main handler for headless mode functionality
+ */
+
 namespace HeadlessWPAdmin\Core;
 
 use HeadlessWPAdmin\Core\Services\RESTService;
 use HeadlessWPAdmin\Core\Services\GraphQLService;
 use HeadlessWPAdmin\Core\Services\SecurityService;
 use HeadlessWPAdmin\Core\Services\CleanupService;
-use HeadlessWPAdmin\Core\BlockedPageRenderer;
 
-/**
- * Main handler for headless mode functionality
- */
 class HeadlessHandler
 {
-    private RESTService $rest_service;
-    private GraphQLService $graphql_service;
-    private SecurityService $security_service;
-    private CleanupService $cleanup_service;
-    private BlockedPageRenderer $blocked_page_renderer;
-    private SettingsManager $settings_manager;
 
-    public function __construct(SettingsManager $settings_manager)
+    /**
+     * REST service instance
+     *
+     * @var RESTService
+     */
+    private $restService;
+
+    /**
+     * GraphQL service instance
+     *
+     * @var GraphQLService
+     */
+    private $graphqlService;
+
+    /**
+     * Security service instance
+     *
+     * @var SecurityService
+     */
+    private $securityService;
+
+    /**
+     * Cleanup service instance
+     *
+     * @var CleanupService
+     */
+    private $cleanupService;
+
+    /**
+     * Blocked page renderer instance
+     *
+     * @var BlockedPageRenderer
+     */
+    private $blockedPageRenderer;
+
+    /**
+     * Settings manager instance
+     *
+     * @var SettingsManager
+     */
+    private $settingsManager;
+
+    /**
+     * Constructor
+     *
+     * @param SettingsManager $settingsManager
+     */
+    public function __construct(SettingsManager $settingsManager)
     {
-        $this->settings_manager = $settings_manager;
-        $this->initialize_services();
-        $this->register_hooks();
+        $this->settingsManager = $settingsManager;
+        $this->initializeServices();
+        $this->registerHooks();
     }
 
     /**
      * Initialize service classes
      */
-    private function initialize_services(): void
+    private function initializeServices(): void
     {
-        $this->rest_service = new RESTService($this);
-        $this->graphql_service = new GraphQLService($this);
-        $this->security_service = new SecurityService($this);
-        $this->cleanup_service = new CleanupService($this);
-        $this->blocked_page_renderer = new BlockedPageRenderer($this->settings_manager);
+        $this->restService = new RESTService($this);
+        $this->graphqlService = new GraphQLService($this);
+        $this->securityService = new SecurityService($this);
+        $this->cleanupService = new CleanupService($this);
+        $this->blockedPageRenderer = new BlockedPageRenderer($this->settingsManager);
     }
 
     /**
      * Register WordPress hooks
      */
-    private function register_hooks(): void
+    private function registerHooks(): void
     {
-        add_action('init', [$this, 'init_headless_mode'], 0);
-        add_action('template_redirect', [$this, 'handle_frontend_requests'], 0);
+        add_action('init', [$this, 'initHeadlessMode'], 0);
+        add_action('template_redirect', [$this, 'handleFrontendRequests'], 0);
     }
 
     /**
@@ -55,7 +96,7 @@ class HeadlessHandler
      */
     public function get_settings(): array
     {
-        return $this->settings_manager->get_settings();
+        return $this->settingsManager->get_settings();
     }
 
     /**
@@ -67,28 +108,28 @@ class HeadlessHandler
      */
     public function get_setting(string $key, $default = null)
     {
-        return $this->settings_manager->get_setting($key, $default);
+        return $this->settingsManager->get_setting($key, $default);
     }
 
     /**
      * Initialize headless mode
      */
-    public function init_headless_mode(): void
+    public function initHeadlessMode(): void
     {
         if ($this->get_setting('debug_logging')) {
             error_log('Headless: Processing request: ' . ($_SERVER['REQUEST_URI'] ?? ''));
         }
 
-        $this->rest_service->configure();
-        $this->graphql_service->configure();
-        $this->security_service->configure();
-        $this->cleanup_service->configure();
+        $this->restService->configure();
+        $this->graphqlService->configure();
+        $this->securityService->configure();
+        $this->cleanupService->configure();
     }
 
     /**
      * Handle frontend requests
      */
-    public function handle_frontend_requests(): void
+    public function handleFrontendRequests(): void
     {
         if ($this->is_allowed_request()) {
             return;
@@ -98,7 +139,7 @@ class HeadlessHandler
             error_log('Headless: Blocked request to: ' . ($_SERVER['REQUEST_URI'] ?? ''));
         }
 
-        $this->handle_blocked_request();
+        $this->handleBlockedRequest();
     }
 
     /**
@@ -108,25 +149,25 @@ class HeadlessHandler
      */
     public function is_allowed_request(): bool
     {
-        $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 
         // Check allowed paths
-        if ($this->is_path_allowed($request_uri)) {
+        if ($this->isPathAllowed($requestUri)) {
             return true;
         }
 
         // Special contexts
-        if ($this->is_special_context()) {
+        if ($this->isSpecialContext()) {
             return true;
         }
 
         // Media access
-        if ($this->get_setting('media_access_enabled') && $this->is_media_request($request_uri)) {
+        if ($this->get_setting('media_access_enabled') && $this->isMediaRequest($requestUri)) {
             return true;
         }
 
         // Preview for authenticated users
-        if ($this->get_setting('preview_access_enabled') && $this->is_preview_request()) {
+        if ($this->get_setting('preview_access_enabled') && $this->isPreviewRequest()) {
             return true;
         }
 
@@ -136,18 +177,18 @@ class HeadlessHandler
     /**
      * Check if path is allowed
      *
-     * @param string $request_uri
+     * @param string $requestUri
      * @return bool
      */
-    private function is_path_allowed(string $request_uri): bool
+    private function isPathAllowed(string $requestUri): bool
     {
-        $allowed_paths = array_filter(
+        $allowedPaths = array_filter(
             explode("\n", $this->get_setting('allowed_paths'))
         );
 
-        foreach ($allowed_paths as $path) {
+        foreach ($allowedPaths as $path) {
             $path = trim($path);
-            if (!empty($path) && strpos($request_uri, $path) !== false) {
+            if (!empty($path) && strpos($requestUri, $path) !== false) {
                 return true;
             }
         }
@@ -160,14 +201,14 @@ class HeadlessHandler
      *
      * @return bool
      */
-    private function is_special_context(): bool
+    private function isSpecialContext(): bool
     {
         return is_admin() ||
             (defined('DOING_AJAX') && DOING_AJAX) ||
             (defined('DOING_CRON') && DOING_CRON) ||
             (defined('WP_CLI') && WP_CLI) ||
-            $this->is_rest_request() ||
-            $this->is_graphql_request();
+            $this->isRestRequest() ||
+            $this->isGraphqlRequest();
     }
 
     /**
@@ -175,7 +216,7 @@ class HeadlessHandler
      *
      * @return bool
      */
-    private function is_rest_request(): bool
+    private function isRestRequest(): bool
     {
         return defined('REST_REQUEST') ||
             strpos($_SERVER['REQUEST_URI'] ?? '', '/wp-json/') !== false;
@@ -186,7 +227,7 @@ class HeadlessHandler
      *
      * @return bool
      */
-    private function is_graphql_request(): bool
+    private function isGraphqlRequest(): bool
     {
         return strpos($_SERVER['REQUEST_URI'] ?? '', '/graphql') !== false;
     }
@@ -197,7 +238,7 @@ class HeadlessHandler
      * @param string $uri
      * @return bool
      */
-    private function is_media_request(string $uri): bool
+    private function isMediaRequest(string $uri): bool
     {
         return preg_match('/\/wp-content\/uploads\/.*\.(jpg|jpeg|png|gif|svg|webp|pdf|doc|docx|mp4|mp3)$/i', $uri) === 1;
     }
@@ -207,27 +248,29 @@ class HeadlessHandler
      *
      * @return bool
      */
-    private function is_preview_request(): bool
+    private function isPreviewRequest(): bool
     {
-        return is_user_logged_in() &&
-            current_user_can('edit_posts') &&
-            (isset($_GET['preview']) || isset($_GET['p']) || isset($_GET['page_id']));
+        $isUserLoggedIn = is_user_logged_in();
+        $canEditPosts = current_user_can('edit_posts');
+        $hasPreviewParam = isset($_GET['preview']) || isset($_GET['p']) || isset($_GET['page_id']);
+
+        return $isUserLoggedIn && $canEditPosts && $hasPreviewParam;
     }
 
     /**
      * Handle blocked request
      */
-    private function handle_blocked_request(): void
+    private function handleBlockedRequest(): void
     {
-        $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 
         // Homepage redirect to admin
-        if ($request_uri === '/' || $request_uri === '' || $request_uri === '/index.php') {
+        if ($requestUri === '/' || $requestUri === '' || $requestUri === '/index.php') {
             wp_redirect(admin_url());
             exit;
         }
 
         // Show blocked page
-        $this->blocked_page_renderer->render();
+        $this->blockedPageRenderer->render();
     }
 }

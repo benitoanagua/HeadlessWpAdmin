@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Headless WordPress Admin
  * Plugin URI: https://benitoanagua.me
- * Description: Administración headless para WordPress con interfaz moderna y configuración completa
+ * Description: Headless administration for WordPress with modern interface and complete configuration
  * Version: 2.0.0
  * Author: Benito Anagua
  * Author URI: https://benitoanagua.me
@@ -21,33 +21,33 @@
 
 namespace HeadlessWPAdmin;
 
-// Evitar acceso directo
+// Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
 }
 
-// Definir constantes del plugin
+// Define plugin constants
 define('HEADLESS_WP_ADMIN_VERSION', '2.0.0');
 define('HEADLESS_WP_ADMIN_PLUGIN_FILE', __FILE__);
 define('HEADLESS_WP_ADMIN_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HEADLESS_WP_ADMIN_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('HEADLESS_WP_ADMIN_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
-// Cargar Composer autoloader
+// Load Composer autoloader
 if (file_exists(__DIR__ . '/vendor/autoload.php')) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
 
-// Inicializar el plugin
+// Initialize the plugin
 add_action('plugins_loaded', function () {
     Core\Plugin::getInstance();
 });
 
-// Hook de activación
+// Activation hook
 register_activation_hook(__FILE__, [Core\Plugin::class, 'activate']);
 
-// Hook de desactivación  
+// Deactivation hook  
 register_deactivation_hook(__FILE__, [Core\Plugin::class, 'deactivate']);
 
-// Hook de desinstalación
+// Uninstallation hook
 register_uninstall_hook(__FILE__, [Core\Plugin::class, 'uninstall']);

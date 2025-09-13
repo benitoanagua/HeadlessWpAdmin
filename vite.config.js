@@ -22,18 +22,16 @@ export default defineConfig({
     rollupOptions: {
       input: [
         "assets/css/app.css",
-        // "assets/js/app.js",
+        "assets/js/admin/main.js",
+        "assets/js/frontend/main.js",
       ],
       output: {
-        // Deshabilitar hashing para nombres de archivo fijos
         entryFileNames: "assets/[name].js",
         chunkFileNames: "assets/[name].js",
         assetFileNames: (assetInfo) => {
-          // Para archivos CSS
           if (assetInfo.name && assetInfo.name.endsWith(".css")) {
-            return "assets/[name][extname]";
+            return "assets/app.css";
           }
-          // Para otros assets (imágenes, fuentes, etc.)
           return "assets/[name].[hash][extname]";
         },
       },

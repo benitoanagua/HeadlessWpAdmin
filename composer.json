@@ -22,8 +22,15 @@
     "php-stubs/wordpress-stubs": "^6.0"
   },
   "autoload": {
-    "psr-4": {
-      "HeadlessWPAdmin\\": "src/"
+    "autoload": {
+      "psr-4": {
+        "HeadlessWPAdmin\\": "src/",
+        "HeadlessWPAdmin\\Core\\": "src/Core/",
+        "HeadlessWPAdmin\\Core\\TemplateSystem\\": "src/Core/TemplateSystem/",
+        "HeadlessWPAdmin\\Core\\TemplateSystem\\RenderStrategy\\": "src/Core/TemplateSystem/RenderStrategy/",
+        "HeadlessWPAdmin\\Views\\": "src/Views/",
+        "HeadlessWPAdmin\\Views\\Components\\": "src/Views/Components/"
+      }
     }
   },
   "autoload-dev": {

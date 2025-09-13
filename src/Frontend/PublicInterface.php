@@ -1,26 +1,38 @@
 <?php
 
+/**
+ * Public Interface Handler for Headless WordPress Admin
+ * Handles frontend rendering and shortcodes
+ */
+
 namespace HeadlessWPAdmin\Frontend;
 
-/**
- * Clase para manejar la interfaz pública
- */
 class PublicInterface
 {
 
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         add_action('wp_footer', [$this, 'renderFrontendApp']);
         add_shortcode('headless-wp-admin', [$this, 'renderShortcode']);
     }
 
+    /**
+     * Render frontend app (if needed)
+     */
     public function renderFrontendApp(): void
     {
-        // Renderizar app frontend si es necesario
+        // Render frontend app if necessary
+        // This can be used for any frontend JavaScript applications
     }
 
     /**
-     * @param array<string, mixed> $atts Atributos del shortcode
+     * Render shortcode
+     *
+     * @param array<string, mixed> $atts Shortcode attributes
+     * @return string
      */
     public function renderShortcode(array $atts = []): string
     {

@@ -214,24 +214,24 @@
 
 <style>
   .headless-admin-container {
-    --apply: p-6 bg-white rounded-lg shadow-sm;
+    --apply: p-6 bg-surface rounded-xl shadow-sm;
   }
 
   .headless-header {
-    --apply: mb-6 pb-4 border-b border-gray-200;
+    --apply: mb-6 pb-4 border-b border-outlineVariant;
   }
 
   .headless-tabs {
-    --apply: flex border-b border-gray-200 mb-6;
+    --apply: flex border-b border-outlineVariant mb-6;
   }
 
   .headless-tabs button {
-    --apply: px-4 py-2 font-medium text-gray-600 hover: text-gray-900 border-b-2
-      border-transparent;
+    --apply: px-4 py-3 font-medium text-onSurfaceVariant border-b-2
+      border-transparent transition-colors duration-200 state-layer;
   }
 
   .headless-tabs button.active {
-    --apply: text-blue-600 border-blue-600;
+    --apply: text-primary border-primary;
   }
 
   .headless-section {
@@ -239,7 +239,7 @@
   }
 
   .headless-section h3 {
-    --apply: text-xl font-semibold mb-4 text-gray-900;
+    --apply: text-xl font-semibold mb-4 text-onSurface;
   }
 
   .headless-form-row {
@@ -247,13 +247,14 @@
   }
 
   .headless-form-row label {
-    --apply: block font-medium text-gray-700 mb-2;
+    --apply: block font-medium text-onSurface mb-2;
   }
 
   .headless-form-row input[type="text"],
   .headless-form-row textarea {
-    --apply: w-full max-w-md px-3 py-2 border border-gray-300 rounded-md
-      shadow-sm focus: outline-none focus: ring-blue-500 focus: border-blue-500;
+    --apply: w-full max-w-md px-4 py-3 border border-outline rounded-lg
+      shadow-sm focus: outline-none focus: ring-2 focus: ring-primary focus:
+      border-primary;
   }
 
   .headless-form-row textarea {
@@ -261,18 +262,18 @@
   }
 
   .headless-footer {
-    --apply: mt-8 pt-6 border-t border-gray-200 flex gap-4;
+    --apply: mt-8 pt-6 border-t border-outlineVariant flex gap-4;
   }
 
   .btn-primary {
-    --apply: px-4 py-2 bg-blue-600 text-white rounded-md hover: bg-blue-700
-      focus: outline-none focus: ring-2 focus: ring-blue-500 focus:
-      ring-offset-2;
+    --apply: px-5 py-3 bg-primary text-onPrimary rounded-full hover:
+      bg-primary/90 focus: outline-none focus: ring-2 focus: ring-primary focus:
+      ring-offset-2 transition-all duration-200 state-layer;
   }
 
   .btn-secondary {
-    --apply: px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover: bg-gray-300
-      focus: outline-none focus: ring-2 focus: ring-gray-500 focus:
-      ring-offset-2;
+    --apply: px-5 py-3 bg-surfaceContainer text-onSurfaceContainer rounded-full
+      hover: bg-surfaceContainerHigh focus: outline-none focus: ring-2 focus:
+      ring-outline focus: ring-offset-2 transition-all duration-200 state-layer;
   }
 </style>

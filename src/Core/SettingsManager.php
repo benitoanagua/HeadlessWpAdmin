@@ -1,12 +1,17 @@
 <?php
 
-namespace HeadlessWPAdmin\Core;
-
 /**
  * Manages plugin settings with validation and defaults
  */
+
+namespace HeadlessWPAdmin\Core;
+
 class SettingsManager
 {
+
+    /**
+     * Option name for settings
+     */
     private const OPTION_NAME = 'headless_wp_settings';
 
     /**
@@ -14,7 +19,7 @@ class SettingsManager
      *
      * @var array<string, mixed>
      */
-    private array $default_settings = [
+    private $defaultSettings = [
         'rest_api_enabled' => false,
         'rest_api_auth_required' => true,
         'rest_api_allowed_routes' => "wp/v2/posts\nwp/v2/pages\nwp/v2/media",
@@ -26,9 +31,9 @@ class SettingsManager
         'graphql_tracing' => false,
         'graphql_caching' => true,
         'blocked_page_enabled' => true,
-        'blocked_page_title' => 'Headless Mode Activo',
-        'blocked_page_subtitle' => 'Este sitio funciona como backend headless',
-        'blocked_page_message' => 'El frontend público está deshabilitado. Accede al panel de administración o utiliza la API GraphQL.',
+        'blocked_page_title' => 'Headless Mode Active',
+        'blocked_page_subtitle' => 'This site works as a headless backend',
+        'blocked_page_message' => 'The public frontend is disabled. Access the admin panel or use the GraphQL API.',
         'blocked_page_icon' => '🚀',
         'blocked_page_background_color' => '#667eea',
         'blocked_page_background_gradient' => 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -61,7 +66,7 @@ class SettingsManager
     public function get_settings(): array
     {
         $settings = get_option(self::OPTION_NAME, []);
-        return wp_parse_args($settings, $this->default_settings);
+        return wp_parse_args($settings, $this->defaultSettings);
     }
 
     /**
@@ -74,7 +79,7 @@ class SettingsManager
     public function get_setting(string $key, $default = null)
     {
         $settings = $this->get_settings();
-        return $settings[$key] ?? $default ?? $this->default_settings[$key] ?? '';
+        return $settings[$key] ?? $default ?? $this->defaultSettings[$key] ?? '';
     }
 
     /**
@@ -85,28 +90,28 @@ class SettingsManager
      */
     public function update_settings(array $settings): bool
     {
-        $validated_settings = $this->validate_settings($settings);
-        return update_option(self::OPTION_NAME, $validated_settings);
+        $validatedSettings = $this->validate_settings($settings);
+        return update_option(self::OPTION_NAME, $validatedSettings);
     }
 
     /**
      * Validate and sanitize settings
      *
-     * @param array<string, mixed> $new_settings
+     * @param array<string, mixed> $newSettings
      * @return array<string, mixed>
      */
-    public function validate_settings(array $new_settings): array
+    public function validate_settings(array $newSettings): array
     {
-        $current_settings = $this->get_settings();
+        $currentSettings = $this->get_settings();
         $validated = [];
 
-        foreach ($this->default_settings as $key => $default_value) {
-            if (isset($new_settings[$key])) {
-                $value = $new_settings[$key];
-                $validated[$key] = $this->sanitize_setting($key, $value, $default_value);
+        foreach ($this->defaultSettings as $key => $defaultValue) {
+            if (isset($newSettings[$key])) {
+                $value = $newSettings[$key];
+                $validated[$key] = $this->sanitize_setting($key, $value, $defaultValue);
             } else {
-                // Mantener el valor actual si no se proporciona uno nuevo
-                $validated[$key] = $current_settings[$key] ?? $default_value;
+                // Keep current value if no new one provided
+                $validated[$key] = $currentSettings[$key] ?? $defaultValue;
             }
         }
 
@@ -118,17 +123,17 @@ class SettingsManager
      *
      * @param string $key
      * @param mixed $value
-     * @param mixed $default_value
+     * @param mixed $defaultValue
      * @return mixed
      */
-    private function sanitize_setting(string $key, $value, $default_value)
+    private function sanitize_setting(string $key, $value, $defaultValue)
     {
-        // Sanitizar según el tipo de campo
-        if (is_bool($default_value)) {
+        // Sanitize based on field type
+        if (is_bool($defaultValue)) {
             return (bool) $value;
         }
 
-        if (filter_var($default_value, FILTER_VALIDATE_URL)) {
+        if (filter_var($defaultValue, FILTER_VALIDATE_URL)) {
             return esc_url_raw($value);
         }
 
@@ -146,7 +151,7 @@ class SettingsManager
      */
     public function get_default_settings(): array
     {
-        return $this->default_settings;
+        return $this->defaultSettings;
     }
 
     /**
@@ -156,7 +161,7 @@ class SettingsManager
      */
     public function reset_to_defaults(): bool
     {
-        return update_option(self::OPTION_NAME, $this->default_settings);
+        return update_option(self::OPTION_NAME, $this->defaultSettings);
     }
 
     /**

@@ -132,9 +132,7 @@ export function generateMaterialTheme(config = {}) {
     const darkColors = extractColors(darkScheme);
 
     // Generar CSS con mejor formato y mayor compatibilidad
-    const cssContent = `@import "tailwindcss";
-    
-@theme {
+    const cssContent = `@theme {
 ${Object.entries(lightColors)
   .map(([k, v]) => `  --color-${k}: ${v};`)
   .join("\n")}

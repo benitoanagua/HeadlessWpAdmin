@@ -1,112 +1,151 @@
 <?php
 
+/**
+ * Asset Manager for Headless WordPress Admin
+ * Centralized management of CSS and JS assets
+ */
+
 namespace HeadlessWPAdmin\Core;
 
-/**
- * Gestión centralizada de assets CSS y JS
- */
 class AssetManager
 {
-    private HeadlessHandler $headlessHandler;
-    private string $version;
-    private string $plugin_url;
-    private string $plugin_path;
 
-    public function __construct(HeadlessHandler $headlessHandler, string $version, string $plugin_url, string $plugin_path)
+    /**
+     * Headless handler instance
+     *
+     * @var HeadlessHandler
+     */
+    private $headlessHandler;
+
+    /**
+     * Plugin version
+     *
+     * @var string
+     */
+    private $version;
+
+    /**
+     * Plugin URL
+     *
+     * @var string
+     */
+    private $pluginUrl;
+
+    /**
+     * Plugin path
+     *
+     * @var string
+     */
+    private $pluginPath;
+
+    /**
+     * Constructor
+     *
+     * @param HeadlessHandler $headlessHandler
+     * @param string $version
+     * @param string $pluginUrl
+     * @param string $pluginPath
+     */
+    public function __construct(HeadlessHandler $headlessHandler, string $version, string $pluginUrl, string $pluginPath)
     {
         $this->headlessHandler = $headlessHandler;
         $this->version = $version;
-        $this->plugin_url = $plugin_url;
-        $this->plugin_path = $plugin_path;
+        $this->pluginUrl = $pluginUrl;
+        $this->pluginPath = $pluginPath;
 
         $this->init();
     }
 
+    /**
+     * Initialize asset management
+     */
     private function init(): void
     {
-        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_assets']);
-        add_action('admin_head', [$this, 'add_admin_dynamic_styles']);
-        add_action('wp_head', [$this, 'add_frontend_dynamic_styles'], 5);
+        add_action('admin_enqueue_scripts', [$this, 'enqueueAdminAssets']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueueFrontendAssets']);
+        add_action('admin_head', [$this, 'addAdminDynamicStyles']);
+        add_action('wp_head', [$this, 'addFrontendDynamicStyles'], 5);
     }
 
     /**
-     * Cargar assets del admin
+     * Enqueue admin assets
+     *
+     * @param string $hook
      */
-    public function enqueue_admin_assets(string $hook): void
+    public function enqueueAdminAssets(string $hook): void
     {
-        // Solo cargar en páginas del plugin
-        if (!$this->is_plugin_admin_page($hook)) {
+        // Only load on plugin admin pages
+        if (!$this->isPluginAdminPage($hook)) {
             return;
         }
 
-        // CSS del admin
-        $this->enqueue_admin_styles();
+        // Admin CSS
+        $this->enqueueAdminStyles();
 
-        // JS del admin
-        $this->enqueue_admin_scripts();
+        // Admin JS
+        $this->enqueueAdminScripts();
 
-        // Assets de WordPress necesarios
-        $this->enqueue_wordpress_assets();
+        // Required WordPress assets
+        $this->enqueueWordPressAssets();
     }
 
     /**
-     * Cargar assets del frontend
+     * Enqueue frontend assets
      */
-    public function enqueue_frontend_assets(): void
+    public function enqueueFrontendAssets(): void
     {
-        // Solo cargar en páginas bloqueadas
-        if (!$this->is_blocked_page_context()) {
+        // Only load on blocked pages
+        if (!$this->isBlockedPageContext()) {
             return;
         }
 
-        $this->enqueue_blocked_page_styles();
+        $this->enqueueBlockedPageStyles();
     }
 
     /**
-     * Encolar estilos del admin
+     * Enqueue admin styles
      */
-    private function enqueue_admin_styles(): void
+    private function enqueueAdminStyles(): void
     {
-        // Estilo principal del admin
+        // Main admin style
         wp_enqueue_style(
             'headless-admin-main',
-            $this->plugin_url . 'assets/css/admin/main.css',
+            $this->pluginUrl . 'assets/css/admin/main.css',
             [],
             $this->version
         );
 
-        // Componentes del admin
+        // Admin components
         wp_enqueue_style(
             'headless-admin-components',
-            $this->plugin_url . 'assets/css/admin/components.css',
+            $this->pluginUrl . 'assets/css/admin/components.css',
             ['headless-admin-main'],
             $this->version
         );
 
-        // Formularios
+        // Forms
         wp_enqueue_style(
             'headless-admin-forms',
-            $this->plugin_url . 'assets/css/admin/forms.css',
+            $this->pluginUrl . 'assets/css/admin/forms.css',
             ['headless-admin-main'],
             $this->version
         );
     }
 
     /**
-     * Encolar scripts del admin
+     * Enqueue admin scripts
      */
-    private function enqueue_admin_scripts(): void
+    private function enqueueAdminScripts(): void
     {
         wp_enqueue_script(
             'headless-admin-main',
-            $this->plugin_url . 'assets/js/admin/main.js',
+            $this->pluginUrl . 'assets/js/admin/main.js',
             ['jquery', 'wp-color-picker'],
             $this->version,
             true
         );
 
-        // Localizar script con configuración
+        // Localize script with configuration
         wp_localize_script('headless-admin-main', 'headlessAdmin', [
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('headless_admin_nonce'),
@@ -114,51 +153,51 @@ class AssetManager
             'graphqlUrl' => home_url('/graphql'),
             'restUrl' => home_url('/wp-json/'),
             'strings' => [
-                'confirmReset' => __('¿Resetear toda la configuración?', 'headless-wp-admin'),
-                'graphqlTestSuccess' => __('GraphQL responde correctamente', 'headless-wp-admin'),
-                'graphqlTestError' => __('Error al conectar con GraphQL', 'headless-wp-admin'),
+                'confirmReset' => __('Reset all settings?', 'headless-wp-admin'),
+                'graphqlTestSuccess' => __('GraphQL is responding correctly', 'headless-wp-admin'),
+                'graphqlTestError' => __('Error connecting to GraphQL', 'headless-wp-admin'),
             ]
         ]);
     }
 
     /**
-     * Encolar assets de WordPress necesarios
+     * Enqueue WordPress assets
      */
-    private function enqueue_wordpress_assets(): void
+    private function enqueueWordPressAssets(): void
     {
         wp_enqueue_style('wp-color-picker');
         wp_enqueue_script('wp-color-picker');
     }
 
     /**
-     * Encolar estilos para páginas bloqueadas
+     * Enqueue blocked page styles
      */
-    private function enqueue_blocked_page_styles(): void
+    private function enqueueBlockedPageStyles(): void
     {
         $settings = $this->headlessHandler->get_settings();
-        $css_hash = $this->generate_css_hash($settings);
+        $cssHash = $this->generateCssHash($settings);
 
-        // Estilo base de página bloqueada
+        // Base blocked page style
         wp_enqueue_style(
             'headless-blocked-page',
-            $this->plugin_url . 'assets/css/frontend/blocked-page.css',
+            $this->pluginUrl . 'assets/css/frontend/blocked-page.css',
             [],
-            $this->version . '-' . $css_hash
+            $this->version . '-' . $cssHash
         );
 
-        // CSS personalizado inline
-        $custom_css = $this->generate_blocked_page_custom_css($settings);
-        if (!empty($custom_css)) {
-            wp_add_inline_style('headless-blocked-page', $custom_css);
+        // Custom inline CSS
+        $customCss = $this->generateBlockedPageCustomCss($settings);
+        if (!empty($customCss)) {
+            wp_add_inline_style('headless-blocked-page', $customCss);
         }
     }
 
     /**
-     * Agregar estilos dinámicos en el admin
+     * Add admin dynamic styles
      */
-    public function add_admin_dynamic_styles(): void
+    public function addAdminDynamicStyles(): void
     {
-        if (!$this->is_plugin_admin_page()) {
+        if (!$this->isPluginAdminPage()) {
             return;
         }
 
@@ -175,11 +214,11 @@ class AssetManager
     }
 
     /**
-     * Agregar estilos dinámicos en el frontend
+     * Add frontend dynamic styles
      */
-    public function add_frontend_dynamic_styles(): void
+    public function addFrontendDynamicStyles(): void
     {
-        if (!$this->is_blocked_page_context()) {
+        if (!$this->isBlockedPageContext()) {
             return;
         }
 
@@ -197,62 +236,69 @@ class AssetManager
     }
 
     /**
-     * Generar CSS personalizado para página bloqueada
-     * 
+     * Generate custom CSS for blocked page
+     *
      * @param array<string, mixed> $settings
+     * @return string
      */
-    private function generate_blocked_page_custom_css(array $settings): string
+    private function generateBlockedPageCustomCss(array $settings): string
     {
-        $custom_css = $settings['blocked_page_custom_css'] ?? '';
+        $customCss = $settings['blocked_page_custom_css'] ?? '';
 
-        if (!empty($custom_css)) {
-            // Sanitizar CSS
-            $custom_css = wp_strip_all_tags($custom_css);
-            $custom_css = preg_replace('/[\\0-\\x1F\\x7F]/', '', $custom_css);
-            return '/* Custom CSS */ ' . $custom_css;
+        if (!empty($customCss)) {
+            // Sanitize CSS
+            $customCss = wp_strip_all_tags($customCss);
+            $customCss = preg_replace('/[\\0-\\x1F\\x7F]/', '', $customCss);
+            return '/* Custom CSS */ ' . $customCss;
         }
 
         return '';
     }
 
     /**
-     * Generar hash para cache busting
-     * 
+     * Generate hash for cache busting
+     *
      * @param array<string, mixed> $settings
+     * @return string
      */
-    private function generate_css_hash(array $settings): string
+    private function generateCssHash(array $settings): string
     {
-        $css_settings = [
+        $cssSettings = [
             $settings['blocked_page_background_color'] ?? '',
             $settings['blocked_page_background_gradient'] ?? '',
             $settings['blocked_page_custom_css'] ?? ''
         ];
 
-        return substr(md5(implode('|', $css_settings)), 0, 8);
+        return substr(md5(implode('|', $cssSettings)), 0, 8);
     }
 
     /**
-     * Verificar si estamos en página de admin del plugin
+     * Check if we're on plugin admin page
+     *
+     * @param string $hook
+     * @return bool
      */
-    private function is_plugin_admin_page(string $hook = ''): bool
+    private function isPluginAdminPage(string $hook = ''): bool
     {
         global $pagenow;
 
-        $current_hook = $hook ?: ($pagenow ?? '');
+        $currentHook = $hook ?: ($pagenow ?? '');
         $page = $_GET['page'] ?? '';
 
-        // Lógica corregida
-        $is_headless_hook = strpos($current_hook, 'headless-') === 0;
-        $is_headless_page = strpos($page, 'headless-') === 0;
-        $is_admin_page_with_headless = $current_hook === 'admin.php' && strpos($page, 'headless-') === 0;
+        // Corrected logic
+        $isHeadlessHook = strpos($currentHook, 'headless-') === 0;
+        $isHeadlessPage = strpos($page, 'headless-') === 0;
+        $isAdminPageWithHeadless = $currentHook === 'admin.php' && strpos($page, 'headless-') === 0;
 
-        return $is_headless_hook || $is_headless_page || $is_admin_page_with_headless;
+        return $isHeadlessHook || $isHeadlessPage || $isAdminPageWithHeadless;
     }
 
     /**
-     * Verificar si estamos en contexto de página bloqueada
+     * Check if we're in blocked page context
+     *
+     * @return bool
      */
-    private function is_blocked_page_context(): bool
+    private function isBlockedPageContext(): bool
     {
         return !is_admin() &&
             !wp_doing_ajax() &&
@@ -261,16 +307,18 @@ class AssetManager
     }
 
     /**
-     * Obtener CSS para página bloqueada (para uso en template)
+     * Get CSS for blocked page (for template usage)
+     *
+     * @return string
      */
-    public function get_blocked_page_css(): string
+    public function getBlockedPageCss(): string
     {
-        $css_file = $this->plugin_path . 'public/css/frontend/blocked-page.css';
-        $base_css = file_exists($css_file) ? file_get_contents($css_file) : '';
+        $cssFile = $this->pluginPath . 'public/css/frontend/blocked-page.css';
+        $baseCss = file_exists($cssFile) ? file_get_contents($cssFile) : '';
 
         $settings = $this->headlessHandler->get_settings();
-        $custom_css = $this->generate_blocked_page_custom_css($settings);
+        $customCss = $this->generateBlockedPageCustomCss($settings);
 
-        return $base_css . $custom_css;
+        return $baseCss . $customCss;
     }
 }

@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./tokens.css";
 
 @import "./admin/main.css";
 @import "./admin/forms.css";
