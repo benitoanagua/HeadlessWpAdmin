@@ -22,15 +22,8 @@
     "php-stubs/wordpress-stubs": "^6.0"
   },
   "autoload": {
-    "autoload": {
-      "psr-4": {
-        "HeadlessWPAdmin\\": "src/",
-        "HeadlessWPAdmin\\Core\\": "src/Core/",
-        "HeadlessWPAdmin\\Core\\TemplateSystem\\": "src/Core/TemplateSystem/",
-        "HeadlessWPAdmin\\Core\\TemplateSystem\\RenderStrategy\\": "src/Core/TemplateSystem/RenderStrategy/",
-        "HeadlessWPAdmin\\Views\\": "src/Views/",
-        "HeadlessWPAdmin\\Views\\Components\\": "src/Views/Components/"
-      }
+    "psr-4": {
+      "HeadlessWPAdmin\\": "src/"
     }
   },
   "autoload-dev": {
@@ -51,6 +44,8 @@
     "allow-plugins": {
       "phpstan/extension-installer": true,
       "dealerdirect/phpcodesniffer-composer-installer": true
-    }
+    },
+    "optimize-autoloader": true,
+    "sort-packages": true
   }
 }

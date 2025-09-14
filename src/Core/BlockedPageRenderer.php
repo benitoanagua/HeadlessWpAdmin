@@ -1,53 +1,25 @@
 <?php
 
-/**
- * Blocked Page Renderer for Headless WordPress Admin
- * Handles rendering of the blocked page for headless mode
- */
-
 namespace HeadlessWPAdmin\Core;
 
 use HeadlessWPAdmin\Core\TemplateSystem\TemplateRenderer;
 
 class BlockedPageRenderer
 {
-
-    /**
-     * Settings manager instance
-     *
-     * @var SettingsManager
-     */
     private $settingsManager;
-
-    /**
-     * Template renderer instance
-     *
-     * @var TemplateRenderer
-     */
     private $templateRenderer;
 
-    /**
-     * Constructor
-     *
-     * @param SettingsManager $settingsManager
-     */
     public function __construct(SettingsManager $settingsManager)
     {
         $this->settingsManager = $settingsManager;
-        $this->templateRenderer = Plugin::getInstance()->getTemplateRenderer();
+        $this->templateRenderer = new TemplateRenderer(HEADLESS_WP_ADMIN_PLUGIN_DIR);
     }
 
-    /**
-     * Render the blocked page
-     */
     public function render(): void
     {
         $this->sendHeaders();
-
-        // Get settings for the blocked page
         $settings = $this->getPageSettings();
 
-        // Additional context
         $context = [
             'settings' => $settings,
             'admin_url' => admin_url(),
@@ -56,14 +28,10 @@ class BlockedPageRenderer
             'is_rest_enabled' => $this->settingsManager->get_setting('rest_api_enabled', false),
         ];
 
-        // Render the blocked page
         echo $this->templateRenderer->render('Frontend/blocked-page', $context);
         exit;
     }
 
-    /**
-     * Send appropriate HTTP headers
-     */
     private function sendHeaders(): void
     {
         header('HTTP/1.1 403 Forbidden');
@@ -71,11 +39,6 @@ class BlockedPageRenderer
         nocache_headers();
     }
 
-    /**
-     * Get page settings with defaults
-     *
-     * @return array<string, mixed>
-     */
     private function getPageSettings(): array
     {
         return [

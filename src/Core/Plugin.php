@@ -57,6 +57,20 @@ class Plugin
     private $templateRenderer;
 
     /**
+     * Flag to track initialization status
+     *
+     * @var bool
+     */
+    private $initialized = false;
+
+    /**
+     * Flag to track initialization in progress
+     *
+     * @var bool
+     */
+    private $initializing = false;
+
+    /**
      * Get plugin instance
      *
      * @return Plugin
@@ -74,48 +88,73 @@ class Plugin
      */
     private function __construct()
     {
-        $this->init();
+        // Empty constructor - deferred initialization
     }
 
     /**
      * Initialize the plugin
      */
-    private function init(): void
+    public function init(): void
     {
-        // Initialize SettingsManager first
-        $this->settingsManager = new SettingsManager();
+        if ($this->initialized) {
+            return;
+        }
 
-        // Initialize the headless handler with SettingsManager
-        $this->headlessHandler = new HeadlessHandler($this->settingsManager);
+        $this->initializing = true;
 
-        // Initialize template system
-        $this->templateRenderer = new TemplateRenderer(HEADLESS_WP_ADMIN_PLUGIN_DIR);
+        try {
+            // Initialize SettingsManager first
+            $this->settingsManager = new SettingsManager();
 
-        // Register global components
-        $this->registerComponents();
+            // Initialize the headless handler with SettingsManager
+            $this->headlessHandler = new HeadlessHandler($this->settingsManager);
 
-        // Initialize asset manager
-        $this->assetManager = new AssetManager(
-            $this->headlessHandler,
-            HEADLESS_WP_ADMIN_VERSION,
-            HEADLESS_WP_ADMIN_PLUGIN_URL,
-            HEADLESS_WP_ADMIN_PLUGIN_DIR
-        );
+            // Initialize template system
+            $this->templateRenderer = new TemplateRenderer(HEADLESS_WP_ADMIN_PLUGIN_DIR);
 
-        add_action('init', [$this, 'loadTextdomain']);
+            // Register global components
+            $this->registerComponents();
 
-        // Initialize components
+            // Initialize asset manager with SettingsManager instead of HeadlessHandler
+            $this->assetManager = new AssetManager(
+                $this->settingsManager,
+                HEADLESS_WP_ADMIN_VERSION,
+                HEADLESS_WP_ADMIN_PLUGIN_URL,
+                HEADLESS_WP_ADMIN_PLUGIN_DIR
+            );
+
+            // Load textdomain on correct hook (init)
+            $this->loadTextdomain();
+
+            // Initialize components based on context
+            $this->initializeContextSpecificComponents();
+
+            // Configure admin interface
+            $this->configureAdminInterface();
+
+            // Set initialized flag AFTER everything is set up
+            $this->initialized = true;
+            $this->initializing = false;
+
+            error_log('Headless WP Admin: Plugin initialized successfully');
+        } catch (\Exception $e) {
+            $this->initializing = false;
+            error_log('Headless WP Admin Init Error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Initialize context-specific components
+     */
+    private function initializeContextSpecificComponents(): void
+    {
         if (is_admin()) {
             new AdminPage($this->headlessHandler, $this->settingsManager);
         } else {
             new PublicInterface();
         }
 
-        // Initialize API endpoints
         new SettingsEndpoint($this->settingsManager);
-
-        // Configure admin interface
-        $this->configureAdminInterface();
     }
 
     /**
@@ -123,19 +162,16 @@ class Plugin
      */
     private function registerComponents(): void
     {
-        // Status indicator component
         $this->templateRenderer->registerComponent(
             'status-indicator',
             new StatusIndicator(false, '')
         );
 
-        // Button component
         $this->templateRenderer->registerComponent(
             'button',
             new Button('', Button::TYPE_PRIMARY)
         );
 
-        // Form field components
         $this->templateRenderer->registerComponent(
             'form-field-checkbox',
             new FormFieldCheckbox('', '', false, '', '')
@@ -177,7 +213,7 @@ class Plugin
         }
 
         $screen = get_current_screen();
-        if ($screen instanceof \WP_Screen && $screen->id !== 'toplevel_page_headless-mode') {
+        if (!($screen instanceof \WP_Screen) || $screen->id !== 'toplevel_page_headless-mode') {
             return;
         }
 
@@ -247,24 +283,34 @@ class Plugin
     }
 
     /**
-     * Load plugin textdomain
+     * Load plugin textdomain at the correct hook
      */
     public function loadTextdomain(): void
     {
-        load_plugin_textdomain(
-            'headless-wp-admin',
-            false,
-            dirname(plugin_basename(HEADLESS_WP_ADMIN_PLUGIN_FILE)) . '/languages/'
-        );
+        // Load textdomain on init hook to avoid early loading warning
+        add_action('init', function () {
+            load_plugin_textdomain(
+                'headless-wp-admin',
+                false,
+                dirname(plugin_basename(HEADLESS_WP_ADMIN_PLUGIN_FILE)) . '/languages/'
+            );
+        });
     }
 
     /**
      * Get template renderer instance
      *
      * @return TemplateRenderer
+     * @throws \RuntimeException Si el plugin no está inicializado
      */
     public function getTemplateRenderer(): TemplateRenderer
     {
+        if (!$this->initialized && !$this->initializing) {
+            throw new \RuntimeException('Plugin not initialized. Call init() first.');
+        }
+        if (null === $this->templateRenderer) {
+            throw new \RuntimeException('TemplateRenderer not available');
+        }
         return $this->templateRenderer;
     }
 
@@ -272,9 +318,13 @@ class Plugin
      * Get headless handler instance
      *
      * @return HeadlessHandler
+     * @throws \RuntimeException Si el plugin no está inicializado
      */
     public function getHeadlessHandler(): HeadlessHandler
     {
+        if (!$this->initialized && !$this->initializing) {
+            throw new \RuntimeException('Plugin not initialized. Call init() first.');
+        }
         return $this->headlessHandler;
     }
 
@@ -282,9 +332,13 @@ class Plugin
      * Get settings manager instance
      *
      * @return SettingsManager
+     * @throws \RuntimeException Si el plugin no está inicializado
      */
     public function getSettingsManager(): SettingsManager
     {
+        if (!$this->initialized && !$this->initializing) {
+            throw new \RuntimeException('Plugin not initialized. Call init() first.');
+        }
         return $this->settingsManager;
     }
 
@@ -292,10 +346,24 @@ class Plugin
      * Get asset manager instance
      *
      * @return AssetManager
+     * @throws \RuntimeException Si el plugin no está inicializado
      */
     public function getAssetManager(): AssetManager
     {
+        if (!$this->initialized && !$this->initializing) {
+            throw new \RuntimeException('Plugin not initialized. Call init() first.');
+        }
         return $this->assetManager;
+    }
+
+    /**
+     * Check if plugin is initialized
+     *
+     * @return bool
+     */
+    public function isInitialized(): bool
+    {
+        return $this->initialized;
     }
 
     /**
@@ -303,16 +371,20 @@ class Plugin
      */
     public static function activate(): void
     {
-        // Activation code
         flush_rewrite_rules();
 
-        // Create default options if they don't exist
-        $settingsManager = new SettingsManager();
-        $headlessHandler = new HeadlessHandler($settingsManager);
-        $defaultSettings = $headlessHandler->get_settings();
+        try {
+            $settingsManager = new SettingsManager();
+            $headlessHandler = new HeadlessHandler($settingsManager);
+            $defaultSettings = $headlessHandler->get_settings();
 
-        if (empty($settingsManager->get_settings())) {
-            $settingsManager->update_settings($defaultSettings);
+            if (empty($settingsManager->get_settings())) {
+                $settingsManager->update_settings($defaultSettings);
+            }
+
+            error_log('Headless WP Admin: Plugin activated successfully');
+        } catch (\Exception $e) {
+            error_log('Headless WP Admin Activation Error: ' . $e->getMessage());
         }
     }
 
@@ -321,14 +393,14 @@ class Plugin
      */
     public static function deactivate(): void
     {
-        // Deactivation code
         flush_rewrite_rules();
 
-        // Clean up cron jobs if necessary
         $timestamp = wp_next_scheduled('headless_cleanup_event');
         if ($timestamp) {
             wp_unschedule_event($timestamp, 'headless_cleanup_event');
         }
+
+        error_log('Headless WP Admin: Plugin deactivated');
     }
 
     /**
@@ -336,19 +408,18 @@ class Plugin
      */
     public static function uninstall(): void
     {
-        // Uninstallation code
         $settingsManager = new SettingsManager();
         $settingsManager->delete_settings();
 
         delete_option('headless_wp_cache');
 
-        // Clean up any related cache
         if (function_exists('wp_cache_flush')) {
             wp_cache_flush();
         }
 
-        // Clean up transients if necessary
         delete_transient('headless_api_status');
         delete_transient('headless_settings_hash');
+
+        error_log('Headless WP Admin: Plugin uninstalled');
     }
 }

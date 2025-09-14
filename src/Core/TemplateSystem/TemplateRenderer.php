@@ -104,25 +104,25 @@ class TemplateRenderer
      */
     private function locateTemplate(string $template): string
     {
-        // 1. Check child theme
+        // 1. Check plugin views first
+        $pluginPath = "{$this->basePath}/src/Views/{$template}.php";
+        if (file_exists($pluginPath)) {
+            return $pluginPath;
+        }
+
+        // 2. Check child theme
         $themePath = get_stylesheet_directory() . "/headless-wp-admin/{$template}.php";
         if (file_exists($themePath)) {
             return $themePath;
         }
 
-        // 2. Check parent theme
+        // 3. Check parent theme
         $parentPath = get_template_directory() . "/headless-wp-admin/{$template}.php";
         if (file_exists($parentPath)) {
             return $parentPath;
         }
 
-        // 3. Check plugin views
-        $pluginPath = "{$this->basePath}/Views/{$template}.php";
-        if (file_exists($pluginPath)) {
-            return $pluginPath;
-        }
-
-        throw new Exception("Template not found: {$template}");
+        throw new Exception("Template not found: {$template}. Searched in: {$pluginPath}");
     }
 
     /**
