@@ -69,6 +69,13 @@ function headless_wp_admin_load_core_classes()
  */
 function headless_wp_admin_init()
 {
+    // Load textdomain
+    load_plugin_textdomain(
+        'headless-wp-admin',
+        false,
+        dirname(plugin_basename(HEADLESS_WP_ADMIN_PLUGIN_FILE)) . '/languages/'
+    );
+
     // Verify that all essential classes exist
     $required_classes = [
         'HeadlessWPAdmin\Core\Plugin',
@@ -108,7 +115,7 @@ function headless_wp_admin_admin_notice()
 }
 
 // Initialize the plugin on plugins_loaded with higher priority
-add_action('plugins_loaded', 'headless_wp_admin_init', 5);
+add_action('init', 'headless_wp_admin_init', 5);
 
 // Activation/deactivation hooks with named functions
 register_activation_hook(__FILE__, 'headless_wp_admin_activate');
