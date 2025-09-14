@@ -9,13 +9,19 @@ namespace HeadlessWPAdmin\Core;
 
 class AssetManager
 {
-
     /**
      * Settings manager instance
      *
      * @var SettingsManager
      */
     private $settingsManager;
+
+    /**
+     * Request validator instance
+     *
+     * @var RequestValidator
+     */
+    private $requestValidator;
 
     /**
      * Plugin version
@@ -49,6 +55,7 @@ class AssetManager
     public function __construct(SettingsManager $settingsManager, string $version, string $pluginUrl, string $pluginPath)
     {
         $this->settingsManager = $settingsManager;
+        $this->requestValidator = new RequestValidator($settingsManager);
         $this->version = $version;
         $this->pluginUrl = $pluginUrl;
         $this->pluginPath = $pluginPath;
@@ -119,7 +126,7 @@ class AssetManager
     public function enqueueFrontendAssets(): void
     {
         // Only load on blocked pages
-        if (!$this->isBlockedPageContext()) {
+        if (!$this->requestValidator->isBlockedPageContext()) {
             return;
         }
 
@@ -176,73 +183,6 @@ class AssetManager
         $isAdminPageWithHeadless = $currentHook === 'admin.php' && strpos($page, 'headless-') === 0;
 
         return $isHeadlessHook || $isHeadlessPage || $isAdminPageWithHeadless;
-    }
-
-    /**
-     * Check if we're in blocked page context
-     *
-     * @return bool
-     */
-    private function isBlockedPageContext(): bool
-    {
-        return !is_admin() &&
-            !wp_doing_ajax() &&
-            !wp_doing_cron() &&
-            !$this->isHeadlessRequestAllowed();
-    }
-
-    /**
-     * Check if headless request is allowed (using settings directly)
-     *
-     * @return bool
-     */
-    private function isHeadlessRequestAllowed(): bool
-    {
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
-
-        // Check allowed paths
-        $allowedPaths = array_filter(
-            explode("\n", $this->settingsManager->get_setting('allowed_paths', ''))
-        );
-
-        foreach ($allowedPaths as $path) {
-            $path = trim($path);
-            if (!empty($path) && strpos($requestUri, $path) !== false) {
-                return true;
-            }
-        }
-
-        // Special contexts
-        if (
-            is_admin() ||
-            (defined('DOING_AJAX') && constant('DOING_AJAX')) ||
-            (defined('DOING_CRON') && constant('DOING_CRON')) ||
-            (defined('WP_CLI') && constant('WP_CLI')) ||
-            strpos($requestUri, '/wp-json/') !== false ||
-            strpos($requestUri, '/graphql') !== false
-        ) {
-            return true;
-        }
-
-        // Media access
-        if (
-            $this->settingsManager->get_setting('media_access_enabled', true) &&
-            preg_match('/\/wp-content\/uploads\/.*\.(jpg|jpeg|png|gif|svg|webp|pdf|doc|docx|mp4|mp3)$/i', $requestUri) === 1
-        ) {
-            return true;
-        }
-
-        // Preview for authenticated users
-        if (
-            $this->settingsManager->get_setting('preview_access_enabled', true) &&
-            is_user_logged_in() &&
-            current_user_can('edit_posts') &&
-            (isset($_GET['preview']) || isset($_GET['p']) || isset($_GET['page_id']))
-        ) {
-            return true;
-        }
-
-        return false;
     }
 
     /**

@@ -6,8 +6,19 @@ use HeadlessWPAdmin\Core\TemplateSystem\TemplateRenderer;
 
 class BlockedPageRenderer
 {
-    private $settingsManager;
-    private $templateRenderer;
+    /**
+     * Settings manager instance
+     *
+     * @var SettingsManager
+     */
+    private SettingsManager $settingsManager;
+
+    /**
+     * Template renderer instance
+     *
+     * @var TemplateRenderer
+     */
+    private TemplateRenderer $templateRenderer;
 
     public function __construct(SettingsManager $settingsManager)
     {
@@ -39,6 +50,11 @@ class BlockedPageRenderer
         nocache_headers();
     }
 
+    /**
+     * Get page settings for blocked page
+     *
+     * @return array<string, mixed>
+     */
     private function getPageSettings(): array
     {
         return [
