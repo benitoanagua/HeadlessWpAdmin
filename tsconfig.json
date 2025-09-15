@@ -1,5 +1,4 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
@@ -17,11 +16,8 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./assets/*"],
-      "@/components/*": ["./assets/svelte/components/*"],
-      "@/lib/*": ["./assets/svelte/lib/*"]
+      "@/*": ["./assets/*"]
     }
   },
-  "include": ["assets/**/*.ts", "assets/**/*.js", "assets/**/*.svelte"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["assets/**/*.js"]
 }
