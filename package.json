@@ -1,6 +1,6 @@
 {
   "name": "headless-wp-admin",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Administración headless para WordPress con interfaz moderna",
   "main": "index.js",
   "type": "module",
@@ -15,9 +15,5 @@
     "tslib": "^2.8.1",
     "typescript": "^5.9.2",
     "vite": "^7.1.5"
-  },
-  "dependencies": {
-    "@wordpress/api-fetch": "^7.30.0",
-    "@wordpress/i18n": "^6.3.0"
   }
 }

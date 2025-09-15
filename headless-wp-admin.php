@@ -4,7 +4,7 @@
  * Plugin Name: Headless WordPress Admin
  * Plugin URI: https://benitoanagua.me
  * Description: Headless administration for WordPress with modern interface and complete configuration
- * Version: 2.0.0
+ * Version: 0.1.0
  * Author: Benito Anagua
  * Author URI: https://benitoanagua.me
  * License: GPL v2 or later
@@ -25,7 +25,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('HEADLESS_WP_ADMIN_VERSION', '2.0.0');
+define('HEADLESS_WP_ADMIN_VERSION', '0.1.0');
 define('HEADLESS_WP_ADMIN_PLUGIN_FILE', __FILE__);
 define('HEADLESS_WP_ADMIN_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('HEADLESS_WP_ADMIN_PLUGIN_URL', plugin_dir_url(__FILE__));
